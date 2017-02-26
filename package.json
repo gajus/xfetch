@@ -1,0 +1,39 @@
+{
+  "author": {
+    "email": "gajus@gajus.com",
+    "name": "Gajus Kuizinas",
+    "url": "http://gajus.com"
+  },
+  "description": "A light-weight module that brings window.fetch to Node.js (with HTTP_PROXY support).",
+  "devDependencies": {
+    "ava": "^0.18.2",
+    "babel-cli": "^6.23.0",
+    "babel-preset-env": "^1.1.10",
+    "husky": "^0.13.1",
+    "semantic-release": "^6.3.6"
+  },
+  "engines": {
+    "node": ">6.0.0"
+  },
+  "keywords": [
+    "promise"
+  ],
+  "license": "BSD-3-Clause",
+  "main": "./dist/index.js",
+  "name": "xfetch",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gajus/xfetch"
+  },
+  "scripts": {
+    "build": "NODE_ENV=production babel ./src --out-dir ./dist --copy-files --source-maps",
+    "precommit": "npm run test",
+    "test": "NODE_ENV=development ava --verbose --serial"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "debug": "^2.6.1",
+    "https-proxy-agent": "^1.0.0",
+    "node-fetch": "^2.0.0-alpha.3"
+  }
+}
