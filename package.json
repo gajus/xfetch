@@ -4,11 +4,18 @@
     "name": "Gajus Kuizinas",
     "url": "http://gajus.com"
   },
+  "ava": {
+    "babel": {
+      "babelrc": true
+    },
+    "require": "babel-register"
+  },
   "description": "A light-weight module that brings window.fetch to Node.js (with HTTP_PROXY support).",
   "devDependencies": {
     "ava": "^0.18.2",
     "babel-cli": "^6.23.0",
     "babel-preset-env": "^1.1.10",
+    "babel-register": "^6.23.0",
     "husky": "^0.13.1",
     "semantic-release": "^6.3.6"
   },
