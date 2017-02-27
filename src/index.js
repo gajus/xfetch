@@ -1,6 +1,13 @@
 import fetch from 'node-fetch';
 import createDebug from 'debug';
 import HttpsProxyAgent from 'https-proxy-agent';
+import {
+  UnexpectedResponseCode
+} from './errors';
+
+export {
+  UnexpectedResponseCode
+};
 
 export {
   Headers,
@@ -10,7 +17,7 @@ export {
 
 const debug = createDebug('xfetch');
 
-export default (url, options = {}) => {
+export default async (url, options = {}) => {
   if (process.env.HTTP_PROXY) {
     debug('using proxy %s', process.env.HTTP_PROXY);
 
@@ -21,5 +28,11 @@ export default (url, options = {}) => {
     options.agent = new HttpsProxyAgent(process.env.HTTP_PROXY);
   }
 
-  return fetch(url, options);
+  const response = fetch(url, options);
+
+  if (!String(response.status).startsWith(2)) {
+    throw new UnexpectedResponseCode(response);
+  }
+
+  return response;
 };
