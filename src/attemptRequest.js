@@ -58,7 +58,7 @@ export default (requestHandler: Function, validateResponse: Function, userRetryC
         debug('received response (status code) %d', response.status);
 
         try {
-          const responseIsValid = validateResponse(response, currentAttempt);
+          const responseIsValid = await validateResponse(response, currentAttempt);
 
           if (responseIsValid === true) {
             resolve(response);
@@ -80,7 +80,7 @@ export default (requestHandler: Function, validateResponse: Function, userRetryC
               status: response.status
             });
           } else {
-            throw error;
+            reject(error);
           }
         }
       });
