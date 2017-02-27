@@ -10,6 +10,12 @@
     },
     "require": "babel-register"
   },
+  "dependencies": {
+    "debug": "^2.6.1",
+    "es6-error": "^4.0.2",
+    "https-proxy-agent": "^1.0.0",
+    "node-fetch": "^2.0.0-alpha.3"
+  },
   "description": "A light-weight module that brings window.fetch to Node.js (with HTTP_PROXY support).",
   "devDependencies": {
     "ava": "^0.18.2",
@@ -55,15 +61,9 @@
   },
   "scripts": {
     "build": "NODE_ENV=production babel ./src --out-dir ./dist --copy-files --source-maps",
-    "test": "NODE_ENV=development ava --verbose --serial"
     "lint": "eslint ./src ./test && flow",
     "precommit": "npm run lint && npm run test && npm run build",
+    "test": "NODE_ENV=development nyc --reporter=text ava --verbose --serial"
   },
-  "version": "1.0.0",
-  "dependencies": {
-    "debug": "^2.6.1",
-    "es6-error": "^4.0.2",
-    "https-proxy-agent": "^1.0.0",
-    "node-fetch": "^2.0.0-alpha.3"
-  }
+  "version": "1.0.0"
 }
