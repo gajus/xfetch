@@ -9,17 +9,19 @@ import createDebug from 'debug';
 import HttpsProxyAgent from 'https-proxy-agent';
 import attemptRequest from './attemptRequest';
 import {
-  UnexpectedResponseCodeError
+  UnexpectedResponseCodeError,
+  UnexpectedResponseError
 } from './errors';
 
-export {
-  Headers,
-  Request,
-  Response,
-  UnexpectedResponseCodeError
-};
-
 const debug = createDebug('xfetch');
+
+const validateResponse = (response) => {
+  if (!String(response.status).startsWith(2)) {
+    throw new UnexpectedResponseCodeError(response);
+  }
+
+  return true;
+};
 
 export default async (url, options = {}) => {
   if (process.env.HTTP_PROXY) {
@@ -34,11 +36,14 @@ export default async (url, options = {}) => {
 
   return attemptRequest(() => {
     return fetch(url, options);
-  }, (response) => {
-    if (!String(response.status).startsWith(2)) {
-      throw new UnexpectedResponseCodeError(response);
-    }
+  }, options.validateResponse || validateResponse, options.retry);
+};
 
-    return true;
-  }, options.retry);
+export {
+  Headers,
+  Request,
+  Response,
+  UnexpectedResponseCodeError,
+  UnexpectedResponseError,
+  validateResponse
 };

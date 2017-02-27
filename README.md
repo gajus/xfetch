@@ -31,3 +31,58 @@ Requests that result in non-2xx response will be retried.
 `retry` option is used to configure request retry strategy.
 
 The `retry` configuration shape matches [configuration of the `retry`](https://github.com/tim-kos/node-retry) module.
+
+### Validating response
+
+Define a custom validator function to force use the request retry strategy.
+
+A custom validator is configured using `validateResponse` configuration, e.g.
+
+```js
+import xfetch, {
+  UnexpectedResponseError
+};
+
+const validateResponse = async (response) => {
+  const body = await response.text();
+
+  if (body.includes('rate error')) {
+    throw new UnexpectedResponseError(response);
+  }
+
+  return true;
+}
+
+xfetch('http://gajus.com', {validateResponse});
+
+```
+
+A custom validator must return a boolean flag indicating whether the response is valid. A custom validator can throw an error that extends `UnexpectedResponseError` error.
+
+`xfetch` default validator can be imported and used to extend a custom validator, e.g.
+
+```js
+import xfetch, {
+  UnexpectedResponseError,
+  validateResponse as defaultValidateResponse
+};
+
+const validateResponse = async (response) => {
+  const responseIsValid = await defaultValidateResponse(response);
+
+  if (!responseIsValid) {
+    return responseIsValid;
+  }
+
+  const body = await response.text();
+
+  if (body.includes('rate error')) {
+    throw new UnexpectedResponseError(response);
+  }
+
+  return true;
+}
+
+xfetch('http://gajus.com', {validateResponse});
+
+```
