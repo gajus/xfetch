@@ -2,6 +2,9 @@
 
 /* eslint-disable no-process-env */
 
+import {
+  parse as parseUrl
+} from 'url';
 import fetch, {
   Headers,
   Request,
@@ -37,6 +40,18 @@ export default async (url: string, userConfiguration: ConfigurationType = {}) =>
 
     configuration.agent = new HttpsProxyAgent(process.env.HTTP_PROXY);
   }
+
+  const urlTokens = parseUrl(url);
+
+  if (!urlTokens.hostname) {
+    throw new Error('Invalid URL.');
+  }
+
+  const host = urlTokens.port === 80 ? urlTokens.host : urlTokens.hostname;
+
+  configuration.headers = configuration.headers || {};
+
+  configuration.headers.host = host;
 
   return attemptRequest(() => {
     return fetch(url, configuration);
