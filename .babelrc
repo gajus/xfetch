@@ -7,6 +7,9 @@
       "sourceMaps": "inline"
     }
   },
+  "plugins": [
+    "transform-flow-comments"
+  ],
   "presets": [
     [
       "env",

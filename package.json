@@ -15,11 +15,13 @@
     "ava": "^0.18.2",
     "babel-cli": "^6.23.0",
     "babel-plugin-istanbul": "^4.0.0",
+    "babel-plugin-transform-flow-comments": "^6.22.0",
     "babel-preset-env": "^1.1.10",
     "babel-register": "^6.23.0",
     "coveralls": "^2.11.16",
     "eslint": "^3.16.1",
     "eslint-config-canonical": "^7.1.0",
+    "flow-bin": "^0.40.0",
     "husky": "^0.13.1",
     "nock": "^9.0.7",
     "nyc": "^10.1.2",
@@ -54,7 +56,7 @@
   "scripts": {
     "build": "NODE_ENV=production babel ./src --out-dir ./dist --copy-files --source-maps",
     "test": "NODE_ENV=development ava --verbose --serial"
-    "lint": "eslint ./src ./test",
+    "lint": "eslint ./src ./test && flow",
     "precommit": "npm run lint && npm run test && npm run build",
   },
   "version": "1.0.0",

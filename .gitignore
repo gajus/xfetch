@@ -5,6 +5,7 @@ node_modules
 .*
 !.babelrc
 !.eslintrc
+!.flowconfig
 !.gitignore
 !.npmignore
 !.travis.yml
