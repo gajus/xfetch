@@ -1,12 +1,17 @@
 /* eslint-disable no-process-env */
 
 import test, {
-  afterEach
+  afterEach,
+  before
 } from 'ava';
 import nock from 'nock';
 import fetch, {
-  UnexpectedResponseCode
+  UnexpectedResponseCodeError
 } from '../src';
+
+before(() => {
+  nock.disableNetConnect();
+});
 
 afterEach(() => {
   delete process.env.HTTP_PROXY;
@@ -26,5 +31,15 @@ test('throws UnexpectedResponseCode if response code is not 2xx', async (t) => {
     .get('/')
     .reply(500);
 
-  await t.throws(fetch('http://gajus.com'), UnexpectedResponseCode);
+  nock('http://gajus.com')
+    .get('/')
+    .reply(500);
+
+  const retry = {
+    maxTimeout: 0,
+    minTimeout: 0,
+    retries: 1
+  };
+
+  await t.throws(fetch('http://gajus.com/', {retry}), UnexpectedResponseCodeError);
 });

@@ -22,4 +22,12 @@ Configure `HTTP_PROXY` (`http://host:port`) environment variable to proxy the re
 
 ### Throws error if response code is non-2xx
 
-Throws `UnexpectedResponseCode` error if response code is non-2xx.
+Throws `UnexpectedResponseCodeError` error if response code is non-2xx.
+
+### Request retry
+
+Requests that result in non-2xx response will be retried.
+
+`retry` option is used to configure request retry strategy.
+
+The `retry` configuration shape matches [configuration of the `retry`](https://github.com/tim-kos/node-retry) module.

@@ -7,15 +7,16 @@ import fetch, {
 } from 'node-fetch';
 import createDebug from 'debug';
 import HttpsProxyAgent from 'https-proxy-agent';
+import attemptRequest from './attemptRequest';
 import {
-  UnexpectedResponseCode
+  UnexpectedResponseCodeError
 } from './errors';
 
 export {
   Headers,
   Request,
   Response,
-  UnexpectedResponseCode
+  UnexpectedResponseCodeError
 };
 
 const debug = createDebug('xfetch');
@@ -31,11 +32,13 @@ export default async (url, options = {}) => {
     options.agent = new HttpsProxyAgent(process.env.HTTP_PROXY);
   }
 
-  const response = fetch(url, options);
+  return attemptRequest(() => {
+    return fetch(url, options);
+  }, (response) => {
+    if (!String(response.status).startsWith(2)) {
+      throw new UnexpectedResponseCodeError(response);
+    }
 
-  if (!String(response.status).startsWith(2)) {
-    throw new UnexpectedResponseCode(response);
-  }
-
-  return response;
+    return true;
+  }, options.retry);
 };
