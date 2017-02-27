@@ -7,6 +7,15 @@
 
 A light-weight module that brings `window.fetch` to Node.js ([with `HTTP_PROXY` support](https://github.com/bitinn/node-fetch/issues/195)).
 
+* [API](#api)
+* [Configuration](#configuration)
+* [Behaviour](#behaviour)
+  * [HTTP proxy](#http-proxy)
+  * [Throws an error if response code is non-2xx](#throws-an-error-if-response-code-is-non-2xx)
+* [Cookbook](#cookbook)
+  * [Retry request](#retry-request)
+  * [Validate response](#validate-response)
+
 ## API
 
 ```js
@@ -46,7 +55,7 @@ type fetch = (url: string, configuration?: ConfigurationType) => Promise<Object>
 |Name|Value|
 |---|---|
 |`retry`|Used to retry requests that produce response that does not pass validation. Refer to [Retry request](#retry-request) and [Validating response](#validating-response).|
-|`validateResponse`|Used to validate response. Refer to [Validating response](#validating-response).|
+|`validateResponse`|Used to validate response. Refer to [Validate response](#validate-response).|
 
 For other configuration properties, refer to [`node-fetch` documentation](https://github.com/bitinn/node-fetch).
 
@@ -65,6 +74,8 @@ Throws `UnexpectedResponseCodeError` error if response code is non-2xx.
 
 This behaviour can be overrode using `validateResponse` configuration.
 
+## Cookbook
+
 ### Retry request
 
 Requests that result in non-2xx response will be retried.
@@ -73,7 +84,7 @@ Requests that result in non-2xx response will be retried.
 
 The `retry` configuration shape matches [configuration of the `retry`](https://github.com/tim-kos/node-retry) module.
 
-### Validating response
+### Validate response
 
 Define a custom validator function to force use the request retry strategy.
 
