@@ -3,6 +3,7 @@ node_modules
 *.log
 .*
 !.babelrc
+!.eslintrc
 !.gitignore
 !.npmignore
 !.travis.yml

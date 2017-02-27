@@ -1,4 +1,6 @@
 import fetch from 'node-fetch';
+/* eslint-disable no-process-env */
+
 import createDebug from 'debug';
 import HttpsProxyAgent from 'https-proxy-agent';
 import {

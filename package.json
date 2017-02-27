@@ -16,6 +16,8 @@
     "babel-cli": "^6.23.0",
     "babel-preset-env": "^1.1.10",
     "babel-register": "^6.23.0",
+    "eslint": "^3.16.1",
+    "eslint-config-canonical": "^7.1.0",
     "husky": "^0.13.1",
     "nock": "^9.0.7",
     "semantic-release": "^6.3.6"
@@ -35,8 +37,9 @@
   },
   "scripts": {
     "build": "NODE_ENV=production babel ./src --out-dir ./dist --copy-files --source-maps",
-    "precommit": "npm run test",
     "test": "NODE_ENV=development ava --verbose --serial"
+    "lint": "eslint ./src ./test",
+    "precommit": "npm run lint && npm run test && npm run build",
   },
   "version": "1.0.0",
   "dependencies": {

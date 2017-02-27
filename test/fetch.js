@@ -1,3 +1,5 @@
+/* eslint-disable no-process-env */
+
 import test, {
   afterEach
 } from 'ava';
