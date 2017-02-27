@@ -11,7 +11,15 @@ A light-weight module that brings `window.fetch` to Node.js ([with `HTTP_PROXY` 
 
 Refer to [`node-fetch` documentation](https://github.com/bitinn/node-fetch).
 
+## Behaviour
+
+### HTTP proxy
+
 Configure `HTTP_PROXY` (`http://host:port`) environment variable to proxy the requests.
 
 > Note: You must also configure `NODE_TLS_REJECT_UNAUTHORIZED=0`.
 > This is a lazy workaround to enable the proxy to work with TLS.
+
+### Throws error if response code is non-2xx
+
+Throws `UnexpectedResponseCode` error if response code is non-2xx.
