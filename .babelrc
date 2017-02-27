@@ -1,4 +1,12 @@
 {
+  "env": {
+    "development": {
+      "plugins": [
+        "istanbul"
+      ],
+      "sourceMaps": "inline"
+    }
+  },
   "presets": [
     [
       "env",

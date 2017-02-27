@@ -1,6 +1,10 @@
-import fetch from 'node-fetch';
 /* eslint-disable no-process-env */
 
+import fetch, {
+  Headers,
+  Request,
+  Response
+} from 'node-fetch';
 import createDebug from 'debug';
 import HttpsProxyAgent from 'https-proxy-agent';
 import {
@@ -8,14 +12,11 @@ import {
 } from './errors';
 
 export {
-  UnexpectedResponseCode
-};
-
-export {
   Headers,
   Request,
-  Response
-} from 'node-fetch';
+  Response,
+  UnexpectedResponseCode
+};
 
 const debug = createDebug('xfetch');
 

@@ -14,12 +14,15 @@
   "devDependencies": {
     "ava": "^0.18.2",
     "babel-cli": "^6.23.0",
+    "babel-plugin-istanbul": "^4.0.0",
     "babel-preset-env": "^1.1.10",
     "babel-register": "^6.23.0",
+    "coveralls": "^2.11.16",
     "eslint": "^3.16.1",
     "eslint-config-canonical": "^7.1.0",
     "husky": "^0.13.1",
     "nock": "^9.0.7",
+    "nyc": "^10.1.2",
     "semantic-release": "^6.3.6"
   },
   "engines": {
@@ -31,6 +34,19 @@
   "license": "BSD-3-Clause",
   "main": "./dist/index.js",
   "name": "xfetch",
+  "nyc": {
+    "include": [
+      "src/**/*.js"
+    ],
+    "instrument": false,
+    "reporter": [
+      "text-lcov"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/gajus/xfetch"
