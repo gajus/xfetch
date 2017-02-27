@@ -1,3 +1,5 @@
+// @flow
+
 /* eslint-disable no-process-env */
 
 import fetch, {
@@ -15,15 +17,19 @@ import {
 
 const debug = createDebug('xfetch');
 
-const validateResponse = (response) => {
-  if (!String(response.status).startsWith(2)) {
+const validateResponse = async (response: Object) => {
+  if (!String(response.status).startsWith('2')) {
     throw new UnexpectedResponseCodeError(response);
   }
 
   return true;
 };
 
-export default async (url, options = {}) => {
+export default async (url: string, userConfiguration: ConfigurationType = {}) => {
+  const configuration = {
+    ...userConfiguration
+  };
+
   if (process.env.HTTP_PROXY) {
     debug('using proxy %s', process.env.HTTP_PROXY);
 
@@ -31,12 +37,12 @@ export default async (url, options = {}) => {
       throw new Error('Must configure NODE_TLS_REJECT_UNAUTHORIZED.');
     }
 
-    options.agent = new HttpsProxyAgent(process.env.HTTP_PROXY);
+    configuration.agent = new HttpsProxyAgent(process.env.HTTP_PROXY);
   }
 
   return attemptRequest(() => {
-    return fetch(url, options);
-  }, options.validateResponse || validateResponse, options.retry);
+    return fetch(url, configuration);
+  }, configuration.validateResponse || validateResponse, configuration.retry);
 };
 
 export {

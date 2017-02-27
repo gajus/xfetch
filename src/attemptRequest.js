@@ -32,17 +32,6 @@ const defaultConfiguration = {
  */
 
 /**
- * @see https://github.com/tim-kos/node-retry#retrytimeoutsoptions
- */
-type RetryConfigurationType = {
-  factor?: number,
-  maxTimeout?: number,
-  minTimeout?: number,
-  randomize?: boolean,
-  retries?: number
-};
-
-/**
  * @param {Function} requestHandler
  * @param {validateResponse} validateResponse
  * @param {retryConfiguration} retryConfiguration

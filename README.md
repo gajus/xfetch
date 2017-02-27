@@ -7,24 +7,65 @@
 
 A light-weight module that brings `window.fetch` to Node.js ([with `HTTP_PROXY` support](https://github.com/bitinn/node-fetch/issues/195)).
 
-## Usage
+## API
 
-Refer to [`node-fetch` documentation](https://github.com/bitinn/node-fetch).
+```js
+/**
+ * @see https://github.com/tim-kos/node-retry#retrytimeoutsoptions
+ */
+type RetryConfigurationType = {
+  factor?: number,
+  maxTimeout?: number,
+  minTimeout?: number,
+  randomize?: boolean,
+  retries?: number
+};
+
+type ValidateResponseType = (response: Object) => Promise<boolean>;
+
+type ConfigurationType = {
+  +agent?: Object,
+  +body?: string | Buffer | Blob | ReadableStream,
+  +compress?: boolean,
+  +follow?: number,
+  +header?: {[key: string]: string | number},
+  +method?: string,
+  +redirect?: 'follow' | 'manual' | 'error',
+  +retry?: RetryConfigurationType,
+  +size?: number,
+  +timeout?: number,
+  +validateResponse?: ValidateResponseType
+};
+
+type fetch = (url: string, configuration?: ConfigurationType) => Promise<Object>;
+
+```
+
+## Configuration
+
+|Name|Value|
+|---|---|
+|`retry`|Used to retry requests that produce response that does not pass validation. Refer to [Retry request](#retry-request) and [Validating response](#validating-response).|
+|`validateResponse`|Used to validate response. Refer to [Validating response](#validating-response).|
+
+For other configuration properties, refer to [`node-fetch` documentation](https://github.com/bitinn/node-fetch).
 
 ## Behaviour
 
 ### HTTP proxy
 
-Configure `HTTP_PROXY` (`http://host:port`) environment variable to proxy the requests.
+Uses `HTTP_PROXY` (`http://host:port`) environment variable value to configure HTTP proxy.
 
 > Note: You must also configure `NODE_TLS_REJECT_UNAUTHORIZED=0`.
 > This is a lazy workaround to enable the proxy to work with TLS.
 
-### Throws error if response code is non-2xx
+### Throws an error if response code is non-2xx
 
 Throws `UnexpectedResponseCodeError` error if response code is non-2xx.
 
-### Request retry
+This behaviour can be overrode using `validateResponse` configuration.
+
+### Retry request
 
 Requests that result in non-2xx response will be retried.
 
