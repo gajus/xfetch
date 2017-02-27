@@ -26,9 +26,7 @@ const validateResponse = async (response: Object) => {
 };
 
 export default async (url: string, userConfiguration: ConfigurationType = {}) => {
-  const configuration = {
-    ...userConfiguration
-  };
+  const configuration = Object.assign({}, userConfiguration);
 
   if (process.env.HTTP_PROXY) {
     debug('using proxy %s', process.env.HTTP_PROXY);
