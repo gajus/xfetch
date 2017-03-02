@@ -13,6 +13,7 @@
   "dependencies": {
     "debug": "^2.6.1",
     "es6-error": "^4.0.2",
+    "http-proxy-agent": "^1.0.0",
     "https-proxy-agent": "^1.0.0",
     "node-fetch": "^2.0.0-alpha.3",
     "retry": "^0.10.1"

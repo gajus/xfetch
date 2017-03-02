@@ -11,6 +11,7 @@ import fetch, {
   Response
 } from 'node-fetch';
 import createDebug from 'debug';
+import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import attemptRequest from './attemptRequest';
 import {
@@ -38,7 +39,9 @@ export default async (url: string, userConfiguration: ConfigurationType = {}) =>
       throw new Error('Must configure NODE_TLS_REJECT_UNAUTHORIZED.');
     }
 
-    configuration.agent = new HttpsProxyAgent(process.env.HTTP_PROXY);
+    const AgentConstructor = url.toLowerCase().startsWith('https://') ? HttpsProxyAgent : HttpProxyAgent;
+
+    configuration.agent = new AgentConstructor(process.env.HTTP_PROXY);
   }
 
   const urlTokens = parseUrl(url);
