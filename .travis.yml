@@ -11,7 +11,7 @@ script:
   - npm run build
   - nyc --silent npm run test
   - nyc report --reporter=text-lcov | coveralls
-  - nyc check-coverage --lines 90
+  - nyc check-coverage --lines 80
 after_success:
   - rm -fr ./dist && npm run build && semantic-release pre && npm publish && semantic-release post
 notifications:
