@@ -19,10 +19,6 @@ A light-weight module that brings `window.fetch` to Node.js ([with `HTTP_PROXY` 
 ## API
 
 ```js
-type RawHeadersType = {
-  [key: string]: string | number
-};
-
 /**
  * @see https://github.com/tim-kos/node-retry#retrytimeoutsoptions
  */
@@ -36,12 +32,16 @@ type RetryConfigurationType = {
 
 type ValidateResponseType = (response: ResponseType) => boolean | Promise<boolean>;
 
+type HeadersConfigurationType = {
+  [key: string]: string | number
+};
+
 type ConfigurationType = {
   +agent?: Object,
   +body?: string | Buffer | Blob | ReadableStream,
   +compress?: boolean,
   +follow?: number,
-  +header?: {[key: string]: string | number},
+  +headers?: HeadersConfigurationType,
   +method?: string,
   +redirect?: 'follow' | 'manual' | 'error',
   +retry?: RetryConfigurationType,
@@ -50,9 +50,13 @@ type ConfigurationType = {
   +validateResponse?: ValidateResponseType
 };
 
+type RawHeadersType = {|
+  [key: string]: Array<string>
+|};
+
 type HeadersType = {|
-  +raw: () => Promise<RawHeadersType>,
-  +get: (name: string) => Promise<string>
+  +raw: () => RawHeadersType,
+  +get: (name: string) => string
 |};
 
 type ResponseType = {|

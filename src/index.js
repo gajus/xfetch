@@ -61,9 +61,9 @@ export default async (url: string, userConfiguration: ConfigurationType = {}): P
 
     return {
       headers: response.headers,
-      json: response.json,
+      json: response.json.bind(response),
       status: response.status,
-      text: response.text
+      text: response.text.bind(response)
     };
   };
 
