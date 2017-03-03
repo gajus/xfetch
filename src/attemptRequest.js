@@ -16,28 +16,11 @@ const defaultConfiguration = {
   retries: 5
 };
 
-/**
- * A callback that when called initiates a request and returns a promise.
- *
- * @typedef {Function} requestHandler
- * @returns {Promise}
- */
-
-/**
- * A callback that handles HTTP response. It must return true to expected response or false to indicate unsuccessful response.
- *
- * @typedef {Function} validateResponse
- * @param {*} response
- * @returns {boolean}
- */
-
-/**
- * @param {Function} requestHandler
- * @param {validateResponse} validateResponse
- * @param {retryConfiguration} retryConfiguration
- * @returns {Promise<HTTPResponse|HTTPError>}
- */
-export default (requestHandler: Function, validateResponse: Function, userRetryConfiguration: RetryConfigurationType = {}): Promise<any> => {
+export default (
+  requestHandler: RequestHandlerType,
+  validateResponse: ValidateResponseType,
+  userRetryConfiguration: RetryConfigurationType = {}
+): Promise<ResponseType> => {
   return new Promise((resolve, reject) => {
     let currentAttempt;
 

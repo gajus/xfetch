@@ -1,7 +1,11 @@
+// @flow
+
 import ExtendableError from 'es6-error';
 
 export class UnexpectedResponseError extends ExtendableError {
-  constructor (response) {
+  response: ResponseType;
+
+  constructor (response: ResponseType) {
     super('Unexpected response.');
 
     this.response = response;
@@ -9,7 +13,7 @@ export class UnexpectedResponseError extends ExtendableError {
 }
 
 export class UnexpectedResponseCodeError extends UnexpectedResponseError {
-  constructor (response) {
+  constructor (response: ResponseType) {
     super(response);
 
     this.message = 'Unespected response code.';

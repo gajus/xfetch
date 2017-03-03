@@ -21,7 +21,7 @@ import {
 
 const debug = createDebug('xfetch');
 
-const validateResponse = async (response: Object) => {
+const validateResponse = async (response: ResponseType): Promise<boolean> => {
   if (!String(response.status).startsWith('2')) {
     throw new UnexpectedResponseCodeError(response);
   }
@@ -29,7 +29,7 @@ const validateResponse = async (response: Object) => {
   return true;
 };
 
-export default async (url: string, userConfiguration: ConfigurationType = {}) => {
+export default async (url: string, userConfiguration: ConfigurationType = {}): Promise<ResponseType> => {
   const configuration = Object.assign({}, userConfiguration);
 
   if (process.env.HTTP_PROXY) {
@@ -56,9 +56,18 @@ export default async (url: string, userConfiguration: ConfigurationType = {}) =>
 
   configuration.headers.host = host;
 
-  return attemptRequest(() => {
-    return fetch(url, configuration);
-  }, configuration.validateResponse || validateResponse, configuration.retry);
+  const responseHandler = async () => {
+    const response = await fetch(url, configuration);
+
+    return {
+      headers: response.headers,
+      json: response.json,
+      status: response.status,
+      text: response.text
+    };
+  };
+
+  return attemptRequest(responseHandler, configuration.validateResponse || validateResponse, configuration.retry);
 };
 
 export {
