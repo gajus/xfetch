@@ -13,7 +13,7 @@ const defaultConfiguration = {
   maxTimeout: Infinity,
   minTimeout: 1000,
   randomize: false,
-  retries: 5
+  retries: 0
 };
 
 export default (
@@ -34,7 +34,7 @@ export default (
       .attempt(async () => {
         ++currentAttempt;
 
-        debug('making %d request attempt (limit: %d)', currentAttempt + 1, retryConfiguration.retries);
+        debug('making %d request attempt (%d allowed retries)', currentAttempt + 1, retryConfiguration.retries);
 
         const response = await requestHandler(currentAttempt);
 

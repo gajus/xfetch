@@ -25,7 +25,8 @@ test('requestHandler() callback is called with the number of the attempt (zero-b
 
     return false;
   }, {
-    minTimeout: 0
+    minTimeout: 0,
+    retries: 3
   });
 });
 
@@ -47,7 +48,8 @@ test('attemptRequest validateResponse callback validateResponse() callback is ca
       return true;
     }
   }, {
-    minTimeout: 0
+    minTimeout: 0,
+    retries: 3
   });
 });
 
@@ -80,6 +82,8 @@ test('attemptRequest validateResponse callback retries a request of which respon
     return createResponse();
   }, (response) => {
     return response.status === 200;
+  }, {
+    retries: 1
   });
 
   t.true(response0.status === 200);
