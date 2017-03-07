@@ -30,6 +30,8 @@ const validateResponse = async (response: ResponseType): Promise<boolean> => {
 };
 
 export default async (url: string, userConfiguration: ConfigurationType = {}): Promise<ResponseType> => {
+  debug('requesting URL %s', url);
+
   const configuration = Object.assign({}, userConfiguration);
 
   if (process.env.HTTP_PROXY) {
