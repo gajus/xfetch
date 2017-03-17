@@ -65,7 +65,7 @@ const handleRedirect = (response: Response, configuration: ConfigurationType) =>
   });
 };
 
-const getHost = (url: string) => {
+const getHost = (url: string): string => {
   const urlTokens = parseUrl(url);
 
   if (!urlTokens.hostname) {
@@ -108,10 +108,13 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
     headers.cookie = cookie;
   }
 
+  const responseType = userConfiguration.responseType || 'text';
+
   const configuration: ConfigurationType = {
     ...userConfiguration,
     agent,
-    headers
+    headers,
+    responseType
   };
 
   return configuration;
@@ -139,7 +142,7 @@ const createFetchConfiguration = (configuration: ConfigurationType): FetchConfig
   return fetchConfiguration;
 };
 
-const makeRequest = async (url: string, userConfiguration: UserConfigurationType = {}): Promise<ResponseType> => {
+const makeRequest = async (url: string, userConfiguration: UserConfigurationType = {}): Promise<FinalResponseType> => {
   debug('requesting URL %s', url);
 
   const configuration = await createConfiguration(url, userConfiguration);
@@ -173,6 +176,10 @@ const makeRequest = async (url: string, userConfiguration: UserConfigurationType
     debug('response identified as a redirect');
 
     return handleRedirect(finalResponse, configuration);
+  }
+
+  if (configuration.responseType === 'text') {
+    return finalResponse.text();
   }
 
   return finalResponse;

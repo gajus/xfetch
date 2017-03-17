@@ -55,7 +55,7 @@ type ResponseType = {|
   +json: () => Promise<Object>,
   +status: number,
   +text: () => Promise<string>
-|};
+|} | string;
 
 /**
  * @property isResponseValid Used to validate response. Refer to [Validate response](#validate-response).
@@ -70,7 +70,8 @@ type UserConfigurationType = {
   +isResponseValid?: IsResponseValidType,
   +jar?: CookieJar,
   +method?: HttpMethodType,
-  +retry?: RetryConfigurationType
+  +retry?: RetryConfigurationType,
+  +responseType?: 'full' | 'text'
 };
 
 type fetch = (url: string, configuration?: ConfigurationType) => Promise<ResponseType>;
@@ -123,7 +124,7 @@ const isResponseValid = async (response) => {
   return true;
 }
 
-xfetch('http://gajus.com', {
+await xfetch('http://gajus.com', {
   isResponseValid
 });
 
@@ -155,7 +156,7 @@ const isResponseValid = async (response) => {
   return true;
 }
 
-xfetch('http://gajus.com', {
+await xfetch('http://gajus.com', {
   isResponseValid
 });
 

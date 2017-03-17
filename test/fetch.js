@@ -35,12 +35,24 @@ test('throws UnexpectedResponseCode if response code is not 2xx', async (t) => {
   await t.throws(fetch('http://gajus.com/'), UnexpectedResponseCodeError);
 });
 
-test('text() resolves the response body', async (t) => {
+test('{responseType: text} resolves the response body ', async (t) => {
   nock('http://gajus.com')
     .get('/')
     .reply(200, 'foo');
 
   const response = await fetch('http://gajus.com/');
+
+  t.true(response === 'foo');
+});
+
+test('text() resolves the response body', async (t) => {
+  nock('http://gajus.com')
+    .get('/')
+    .reply(200, 'foo');
+
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'full'
+  });
 
   t.true(await response.text() === 'foo');
 });
@@ -50,7 +62,9 @@ test('json() resolves to the response body', async (t) => {
     .get('/')
     .reply(200, '{"foo":"bar"}');
 
-  const response = await fetch('http://gajus.com/');
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'full'
+  });
 
   const responseBody = await response.json();
 
@@ -66,7 +80,9 @@ test('headers.raw() resolves response headers', async (t) => {
       'x-foo': 'bar'
     });
 
-  const response = await fetch('http://gajus.com/');
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'full'
+  });
 
   const responseHeaders = response.headers.raw();
 
@@ -84,7 +100,9 @@ test('headers.get() resolves response header', async (t) => {
       'x-foo': 'bar'
     });
 
-  const response = await fetch('http://gajus.com/');
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'full'
+  });
 
   const responseHeaderValue = response.headers.get('x-foo');
 
@@ -104,7 +122,7 @@ test('follows 3xx redirects', async (t) => {
 
   const response = await fetch('http://gajus.com/');
 
-  t.true(await response.text() === 'bar');
+  t.true(response === 'bar');
 });
 
 test('follows 3xx redirect preserves the original headers', async (t) => {
@@ -132,7 +150,7 @@ test('follows 3xx redirect preserves the original headers', async (t) => {
     }
   });
 
-  t.true(await response.text() === 'bar');
+  t.true(response === 'bar');
 });
 
 test('3xx redirect preserves the original request method if it is safe (GET, HEAD, OPTIONS or TRACE)', async (t) => {
@@ -158,7 +176,7 @@ test('3xx redirect preserves the original request method if it is safe (GET, HEA
       method: safeMethod
     });
 
-    t.true(await response.text() === 'bar');
+    t.true(response === 'bar');
   }
 });
 
@@ -177,7 +195,7 @@ test('3xx redirect changes the request method to GET if the original request met
     method: 'post'
   });
 
-  t.true(await response.text() === 'bar');
+  t.true(response === 'bar');
 });
 
 test('redirects persist cookies in a cookie jar', async (t) => {
@@ -202,5 +220,5 @@ test('redirects persist cookies in a cookie jar', async (t) => {
     jar
   });
 
-  t.true(await response.text() === 'bar');
+  t.true(response === 'bar');
 });

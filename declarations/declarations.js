@@ -52,7 +52,8 @@ type UserConfigurationType = {
   +isResponseValid?: IsResponseValidType,
   +jar?: CookieJar,
   +method?: HttpMethodType,
-  +retry?: RetryConfigurationType
+  +retry?: RetryConfigurationType,
+  +responseType?: 'full' | 'text'
 };
 
 type ConfigurationType = {
@@ -64,7 +65,8 @@ type ConfigurationType = {
   +isResponseValid?: IsResponseValidType,
   +jar?: CookieJar,
   +method?: HttpMethodType,
-  +retry?: RetryConfigurationType
+  +retry?: RetryConfigurationType,
+  +responseType: 'full' | 'text'
 };
 
 type FetchConfigurationType = {
@@ -91,3 +93,5 @@ type ResponseType = {|
   +status: number,
   +text: () => Promise<string>
 |};
+
+type FinalResponseType = ResponseType | string;
