@@ -45,6 +45,18 @@ test('{responseType: text} resolves the response body ', async (t) => {
   t.true(response === 'foo');
 });
 
+test('{responseType: json} resolves the response body and parses using JSON.parse ', async (t) => {
+  nock('http://gajus.com')
+    .get('/')
+    .reply(200, '"foo"');
+
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'json'
+  });
+
+  t.true(response === 'foo');
+});
+
 test('text() resolves the response body', async (t) => {
   nock('http://gajus.com')
     .get('/')

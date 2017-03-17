@@ -182,6 +182,10 @@ const makeRequest = async (url: string, userConfiguration: UserConfigurationType
     return finalResponse.text();
   }
 
+  if (configuration.responseType === 'json') {
+    return finalResponse.json();
+  }
+
   return finalResponse;
 };
 
