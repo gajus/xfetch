@@ -1,5 +1,13 @@
 /* eslint-disable no-unused-vars, no-use-before-define */
 
+import HttpProxyAgent from 'http-proxy-agent';
+import HttpsProxyAgent from 'https-proxy-agent';
+import {
+  CookieJar
+} from 'tough-cookie';
+
+type HttpMethodType = string;
+
 /**
  * @see https://github.com/tim-kos/node-retry#retrytimeoutsoptions
  */
@@ -19,24 +27,53 @@ type RequestHandlerType = (attemptNumber: number) => Promise<ResponseType>;
 /**
  * A callback that handles HTTP response. It must return true to expected response or false to indicate unsuccessful response.
  */
-type ValidateResponseType = (response: ResponseType) => boolean | Promise<boolean>;
+type IsResponseValidType = (response: ResponseType) => boolean | Promise<boolean>;
 
 type HeadersConfigurationType = {
   [key: string]: string | number
 };
 
-type ConfigurationType = {
-  +agent?: Object,
-  +body?: string | Buffer | Blob | ReadableStream,
+/**
+ * A callback used to validate HTTP redirect attempt.
+ *
+ * Returning false will return the current response.
+ * Returning true will follow the redirect.
+ * The default behaviour is to follow the redirect.
+ */
+type HandleRedirectType = (response: ResponseType) => boolean | Promise<boolean>;
+
+type IsResponseRedirectType = (Response: ResponseType) => boolean;
+
+type UserConfigurationType = {
+  +body?: string,
   +compress?: boolean,
-  +follow?: number,
   +headers?: HeadersConfigurationType,
-  +method?: string,
-  +redirect?: 'follow' | 'manual' | 'error',
-  +retry?: RetryConfigurationType,
-  +size?: number,
-  +timeout?: number,
-  +validateResponse?: ValidateResponseType
+  +isResponseRedirect?: IsResponseRedirectType,
+  +isResponseValid?: IsResponseValidType,
+  +jar?: CookieJar,
+  +method?: HttpMethodType,
+  +retry?: RetryConfigurationType
+};
+
+type ConfigurationType = {
+  +agent?: HttpProxyAgent | HttpsProxyAgent,
+  +body?: string,
+  +compress?: boolean,
+  +headers: HeadersConfigurationType,
+  +isResponseRedirect: IsResponseRedirectType,
+  +isResponseValid?: IsResponseValidType,
+  +jar?: CookieJar,
+  +method?: HttpMethodType,
+  +retry?: RetryConfigurationType
+};
+
+type FetchConfigurationType = {
+  +agent?: HttpProxyAgent | HttpsProxyAgent,
+  +body?: string,
+  +compress?: boolean,
+  +headers: HeadersConfigurationType,
+  +method: HttpMethodType,
+  +redirect: 'manual'
 };
 
 type RawHeadersType = {|

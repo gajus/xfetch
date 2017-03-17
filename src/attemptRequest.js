@@ -18,7 +18,7 @@ const defaultConfiguration = {
 
 export default (
   requestHandler: RequestHandlerType,
-  validateResponse: ValidateResponseType,
+  isResponseValid: IsResponseValidType,
   userRetryConfiguration: RetryConfigurationType = {}
 ): Promise<ResponseType> => {
   return new Promise((resolve, reject) => {
@@ -41,7 +41,7 @@ export default (
         debug('received response (status code) %d', response.status);
 
         try {
-          const responseIsValid = await validateResponse(response, currentAttempt);
+          const responseIsValid = await isResponseValid(response, currentAttempt);
 
           if (responseIsValid === true) {
             resolve(response);

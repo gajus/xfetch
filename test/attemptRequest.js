@@ -30,7 +30,7 @@ test('requestHandler() callback is called with the number of the attempt (zero-b
   });
 });
 
-test('attemptRequest validateResponse callback validateResponse() callback is called with the number of the attempt (zero-based index)', async (t) => {
+test('attemptRequest isResponseValid callback isResponseValid() callback is called with the number of the attempt (zero-based index)', async (t) => {
   t.plan(4);
 
   let responseNumber;
@@ -53,7 +53,7 @@ test('attemptRequest validateResponse callback validateResponse() callback is ca
   });
 });
 
-test('attemptRequest validateResponse callback is using validateResponse callback to validate the response', async (t) => {
+test('attemptRequest isResponseValid callback is using isResponseValid callback to validate the response', async (t) => {
   t.plan(2);
 
   const response0 = await attemptRequest(() => {
@@ -67,7 +67,7 @@ test('attemptRequest validateResponse callback is using validateResponse callbac
   t.true(response0.status === 200);
 });
 
-test('attemptRequest validateResponse callback retries a request of which response does not validate against validateResponse', async (t) => {
+test('attemptRequest isResponseValid callback retries a request of which response does not validate against isResponseValid', async (t) => {
   let firstRequest;
 
   firstRequest = true;

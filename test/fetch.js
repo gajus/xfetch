@@ -1,11 +1,12 @@
 /* eslint-disable no-process-env */
 
 import test, {
-  afterEach,
-  before
+  before,
+  beforeEach
 } from 'ava';
 import nock from 'nock';
 import fetch, {
+  CookieJar,
   UnexpectedResponseCodeError
 } from '../src';
 
@@ -13,7 +14,7 @@ before(() => {
   nock.disableNetConnect();
 });
 
-afterEach(() => {
+beforeEach(() => {
   delete process.env.HTTP_PROXY;
   delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
 });
@@ -31,27 +32,17 @@ test('throws UnexpectedResponseCode if response code is not 2xx', async (t) => {
     .get('/')
     .reply(500);
 
-  nock('http://gajus.com')
-    .get('/')
-    .reply(500);
-
-  const retry = {
-    maxTimeout: 0,
-    minTimeout: 0,
-    retries: 1
-  };
-
-  await t.throws(fetch('http://gajus.com/', {retry}), UnexpectedResponseCodeError);
+  await t.throws(fetch('http://gajus.com/'), UnexpectedResponseCodeError);
 });
 
-test('text() resolves to the response body', async (t) => {
+test('text() resolves the response body', async (t) => {
   nock('http://gajus.com')
     .get('/')
-    .reply(200, 'Hello, World!');
+    .reply(200, 'foo');
 
   const response = await fetch('http://gajus.com/');
 
-  t.true(await response.text() === 'Hello, World!');
+  t.true(await response.text() === 'foo');
 });
 
 test('json() resolves to the response body', async (t) => {
@@ -71,7 +62,7 @@ test('json() resolves to the response body', async (t) => {
 test('headers.raw() resolves response headers', async (t) => {
   nock('http://gajus.com')
     .get('/')
-    .reply(200, 'Hello, World!', {
+    .reply(200, 'foo', {
       'x-foo': 'bar'
     });
 
@@ -89,7 +80,7 @@ test('headers.raw() resolves response headers', async (t) => {
 test('headers.get() resolves response header', async (t) => {
   nock('http://gajus.com')
     .get('/')
-    .reply(200, 'Hello, World!', {
+    .reply(200, 'foo', {
       'x-foo': 'bar'
     });
 
@@ -98,4 +89,118 @@ test('headers.get() resolves response header', async (t) => {
   const responseHeaderValue = response.headers.get('x-foo');
 
   t.true(responseHeaderValue === 'bar');
+});
+
+test('follows 3xx redirects', async (t) => {
+  nock('http://gajus.com')
+    .get('/')
+    .reply(301, 'foo', {
+      Location: 'http://gajus.com/foo'
+    });
+
+  nock('http://gajus.com')
+    .get('/foo')
+    .reply(200, 'bar');
+
+  const response = await fetch('http://gajus.com/');
+
+  t.true(await response.text() === 'bar');
+});
+
+test('follows 3xx redirect preserves the original headers', async (t) => {
+  nock('http://gajus.com', {
+    reqheaders: {
+      'x-foo': 'FOO'
+    }
+  })
+    .get('/')
+    .reply(301, '', {
+      location: 'http://gajus.com/foo'
+    });
+
+  nock('http://gajus.com', {
+    reqheaders: {
+      'x-foo': 'FOO'
+    }
+  })
+    .get('/foo')
+    .reply(200, 'bar');
+
+  const response = await fetch('http://gajus.com/', {
+    headers: {
+      'x-foo': 'FOO'
+    }
+  });
+
+  t.true(await response.text() === 'bar');
+});
+
+test('3xx redirect preserves the original request method if it is safe (GET, HEAD, OPTIONS or TRACE)', async (t) => {
+  const safeMethods = [
+    'get',
+    'head',
+    'options'
+
+    // @todo Nock does not implement "trace" method.
+    // 'trace'
+  ];
+
+  for (const safeMethod of safeMethods) {
+    nock('http://gajus.com')[safeMethod]('/')
+      .reply(301, 'foo', {
+        location: 'http://gajus.com/foo'
+      });
+
+    nock('http://gajus.com')[safeMethod]('/foo')
+      .reply(200, 'bar');
+
+    const response = await fetch('http://gajus.com/', {
+      method: safeMethod
+    });
+
+    t.true(await response.text() === 'bar');
+  }
+});
+
+test('3xx redirect changes the request method to GET if the original request method is not safe to repeat (e.g. POST)', async (t) => {
+  nock('http://gajus.com')
+    .post('/')
+    .reply(301, 'foo', {
+      location: 'http://gajus.com/foo'
+    });
+
+  nock('http://gajus.com')
+    .get('/foo')
+    .reply(200, 'bar');
+
+  const response = await fetch('http://gajus.com/', {
+    method: 'post'
+  });
+
+  t.true(await response.text() === 'bar');
+});
+
+test('redirects persist cookies in a cookie jar', async (t) => {
+  const jar = new CookieJar();
+
+  nock('http://gajus.com')
+    .get('/')
+    .reply(301, 'foo', {
+      location: 'http://gajus.com/foo',
+      'set-cookie': 'foo=bar'
+    });
+
+  nock('http://gajus.com', {
+    reqheaders: {
+      cookie: 'foo=bar'
+    }
+  })
+    .get('/foo')
+    .reply(200, 'bar');
+
+  const response = await fetch('http://gajus.com/', {
+    jar
+  });
+
+  t.true(await response.text() === 'bar');
 });

@@ -2,14 +2,21 @@
 
 /* eslint-disable no-process-env */
 
+// eslint-disable-next-line
 import {
   parse as parseUrl
 } from 'url';
+import {
+  promisify
+} from 'bluefeather';
 import fetch, {
   Headers,
   Request,
   Response
 } from 'node-fetch';
+import {
+  CookieJar
+} from 'tough-cookie';
 import createDebug from 'debug';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
@@ -21,18 +28,63 @@ import {
 
 const debug = createDebug('xfetch');
 
-const validateResponse = async (response: ResponseType): Promise<boolean> => {
-  if (!String(response.status).startsWith('2')) {
+const isResponseValid: IsResponseValidType = async (response) => {
+  if (!String(response.status).startsWith('2') && !String(response.status).startsWith('3')) {
     throw new UnexpectedResponseCodeError(response);
   }
 
   return true;
 };
 
-export default async (url: string, userConfiguration: ConfigurationType = {}): Promise<ResponseType> => {
-  debug('requesting URL %s', url);
+const isResponseRedirect: IsResponseRedirectType = (response) => {
+  return String(response.status).startsWith('3');
+};
 
-  const configuration = Object.assign({}, userConfiguration);
+const handleRedirect = (response: Response, configuration: ConfigurationType) => {
+  const location = response.headers.get('location');
+
+  if (!location) {
+    throw new Error('Missing the location header.');
+  }
+
+  const originalMethod = configuration.method && configuration.method.toLowerCase();
+
+  const safeMethods = [
+    'get',
+    'head',
+    'options',
+    'trace'
+  ];
+
+  const nextMethod = safeMethods.includes(originalMethod) ? originalMethod : 'get';
+
+  // eslint-disable-next-line no-use-before-define
+  return makeRequest(location, {
+    ...configuration,
+    method: nextMethod
+  });
+};
+
+const getHost = (url: string) => {
+  const urlTokens = parseUrl(url);
+
+  if (!urlTokens.hostname) {
+    throw new Error('Invalid URL.');
+  }
+
+  return urlTokens.port === 80 ? urlTokens.host : urlTokens.hostname;
+};
+
+const createConfiguration = async (url: string, userConfiguration: UserConfigurationType): Promise<ConfigurationType> => {
+  let cookie;
+
+  if (userConfiguration.jar) {
+    const getCookieString = promisify(userConfiguration.jar.getCookieString.bind(userConfiguration.jar));
+
+    cookie = await getCookieString(url);
+  }
+
+  let agent;
 
   if (process.env.HTTP_PROXY) {
     debug('using proxy %s', process.env.HTTP_PROXY);
@@ -43,23 +95,69 @@ export default async (url: string, userConfiguration: ConfigurationType = {}): P
 
     const AgentConstructor = url.toLowerCase().startsWith('https://') ? HttpsProxyAgent : HttpProxyAgent;
 
-    configuration.agent = new AgentConstructor(process.env.HTTP_PROXY);
+    agent = new AgentConstructor(process.env.HTTP_PROXY);
   }
 
-  const urlTokens = parseUrl(url);
+  const host = getHost(url);
 
-  if (!urlTokens.hostname) {
-    throw new Error('Invalid URL.');
+  const headers = userConfiguration.headers || {};
+
+  headers.host = host;
+
+  if (cookie) {
+    headers.cookie = cookie;
   }
 
-  const host = urlTokens.port === 80 ? urlTokens.host : urlTokens.hostname;
+  const configuration: ConfigurationType = {
+    ...userConfiguration,
+    agent,
+    headers
+  };
 
-  configuration.headers = configuration.headers || {};
+  return configuration;
+};
 
-  configuration.headers.host = host;
+const createFetchConfiguration = (configuration: ConfigurationType): FetchConfigurationType => {
+  const fetchConfiguration: Object = {
+    method: configuration.method || 'get',
+    redirect: 'manual'
+  };
 
-  const responseHandler = async () => {
-    const response = await fetch(url, configuration);
+  const fetchConfigurationOptionalProperties = [
+    'agent',
+    'body',
+    'compress',
+    'headers'
+  ];
+
+  for (const fetchConfigurationOptionalProperty of fetchConfigurationOptionalProperties) {
+    if (configuration[fetchConfigurationOptionalProperty]) {
+      fetchConfiguration[fetchConfigurationOptionalProperty] = configuration[fetchConfigurationOptionalProperty];
+    }
+  }
+
+  return fetchConfiguration;
+};
+
+const makeRequest = async (url: string, userConfiguration: UserConfigurationType = {}): Promise<ResponseType> => {
+  debug('requesting URL %s', url);
+
+  const configuration = await createConfiguration(url, userConfiguration);
+
+  const createRequestAttempt = async (): Promise<ResponseType> => {
+    const fetchConfiguration = createFetchConfiguration(configuration);
+
+    const response = await fetch(url, fetchConfiguration);
+
+    if (userConfiguration.jar) {
+      const setCookie = promisify(userConfiguration.jar.setCookie.bind(userConfiguration.jar));
+
+      const cookie = response.headers.get('set-cookie');
+
+      if (cookie) {
+        await setCookie(cookie, url);
+      }
+    }
 
     return {
       headers: response.headers,
@@ -69,14 +167,26 @@ export default async (url: string, userConfiguration: ConfigurationType = {}): P
     };
   };
 
-  return attemptRequest(responseHandler, configuration.validateResponse || validateResponse, configuration.retry);
+  const finalResponse = await attemptRequest(createRequestAttempt, configuration.isResponseValid || isResponseValid, configuration.retry);
+
+  if (isResponseRedirect(finalResponse)) {
+    debug('response identified as a redirect');
+
+    return handleRedirect(finalResponse, configuration);
+  }
+
+  return finalResponse;
 };
 
+export default makeRequest;
+
 export {
+  CookieJar,
   Headers,
+  isResponseRedirect,
+  isResponseValid,
   Request,
   Response,
   UnexpectedResponseCodeError,
-  UnexpectedResponseError,
-  validateResponse
+  UnexpectedResponseError
 };
