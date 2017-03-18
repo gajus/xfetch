@@ -70,6 +70,7 @@ type UserConfigurationType = {
   +isResponseValid?: IsResponseValidType,
   +jar?: CookieJar,
   +method?: HttpMethodType,
+  +query?: Object,
   +retry?: RetryConfigurationType,
   +responseType?: 'full' | 'text'
 };

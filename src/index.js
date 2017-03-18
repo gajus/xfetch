@@ -4,6 +4,7 @@
 
 // eslint-disable-next-line
 import {
+  format as formatUrl,
   parse as parseUrl
 } from 'url';
 import {
@@ -142,10 +143,24 @@ const createFetchConfiguration = (configuration: ConfigurationType): FetchConfig
   return fetchConfiguration;
 };
 
-const makeRequest = async (url: string, userConfiguration: UserConfigurationType = {}): Promise<FinalResponseType> => {
-  debug('requesting URL %s', url);
+const createUrlWithQuery = (url: string, query: Object) => {
+  const urlTokens = parseUrl(url);
 
-  const configuration = await createConfiguration(url, userConfiguration);
+  if (urlTokens.query) {
+    throw new Error('Cannot append query parameters to URL with existing query parameters.');
+  }
+
+  urlTokens.query = query;
+
+  return formatUrl(urlTokens);
+};
+
+const makeRequest = async (inputUrl: string, userConfiguration: UserConfigurationType = {}): Promise<FinalResponseType> => {
+  debug('requesting URL %s', inputUrl);
+
+  const configuration = await createConfiguration(inputUrl, userConfiguration);
+
+  const url = configuration.query ? createUrlWithQuery(inputUrl, configuration.query) : inputUrl;
 
   const createRequestAttempt = async (): Promise<ResponseType> => {
     const fetchConfiguration = createFetchConfiguration(configuration);

@@ -45,6 +45,31 @@ test('{responseType: text} resolves the response body ', async (t) => {
   t.true(response === 'foo');
 });
 
+test('query parameter appends query to the URL', async (t) => {
+  nock('http://gajus.com')
+    .get('/')
+    .query({
+      foo: 'bar'
+    })
+    .reply(200, 'foo');
+
+  const response = await fetch('http://gajus.com/', {
+    query: {
+      foo: 'bar'
+    }
+  });
+
+  t.true(response === 'foo');
+});
+
+test('query parameter throws an error when URL already contains query parameters', async (t) => {
+  await t.throws(fetch('http://gajus.com/?foo=bar', {
+    query: {
+      baz: 'qux'
+    }
+  }));
+});
+
 test('{responseType: json} resolves the response body and parses using JSON.parse ', async (t) => {
   nock('http://gajus.com')
     .get('/')
