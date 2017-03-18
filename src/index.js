@@ -155,12 +155,10 @@ const makeRequest = async (url: string, userConfiguration: UserConfigurationType
     if (userConfiguration.jar) {
       const setCookie = promisify(userConfiguration.jar.setCookie.bind(userConfiguration.jar));
 
-      const cookies = response.headers.get('set-cookie');
+      const cookies = response.headers.raw()['set-cookie'];
 
       if (cookies) {
-        const cookieList = cookies.split(',');
-
-        for (const cookie of cookieList) {
+        for (const cookie of cookies) {
           await setCookie(cookie, url);
         }
       }
