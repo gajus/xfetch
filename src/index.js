@@ -183,7 +183,8 @@ const makeRequest = async (inputUrl: string, userConfiguration: UserConfiguratio
       headers: response.headers,
       json: response.json.bind(response),
       status: response.status,
-      text: response.text.bind(response)
+      text: response.text.bind(response),
+      url
     };
   };
 

@@ -93,7 +93,8 @@ type ResponseType = {|
   +headers: HeadersType,
   +json: () => Promise<Object>,
   +status: number,
-  +text: () => Promise<string>
+  +text: () => Promise<string>,
+  +url: string
 |};
 
 type FinalResponseType = ResponseType | string | Object;

@@ -157,9 +157,12 @@ test('follows 3xx redirects', async (t) => {
     .get('/foo')
     .reply(200, 'bar');
 
-  const response = await fetch('http://gajus.com/');
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'full'
+  });
 
-  t.true(response === 'bar');
+  t.true(await response.text() === 'bar');
+  t.true(response.url === 'http://gajus.com/foo');
 });
 
 test('follows 3xx redirect preserves the original headers', async (t) => {
