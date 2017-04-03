@@ -2,7 +2,7 @@
 
 /* eslint-disable no-process-env */
 
-// eslint-disable-next-line
+// eslint-disable-next-line filenames/match-exported
 import {
   format as formatUrl,
   parse as parseUrl
