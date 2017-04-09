@@ -13,8 +13,7 @@
       {
         "useBuiltIns": true
       }
-    ],
-    "transform-flow-comments"
+    ]
   ],
   "presets": [
     [
