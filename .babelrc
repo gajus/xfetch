@@ -13,7 +13,8 @@
       {
         "useBuiltIns": true
       }
-    ]
+    ],
+    "transform-flow-strip-types"
   ],
   "presets": [
     [
