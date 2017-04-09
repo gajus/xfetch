@@ -21,6 +21,15 @@ import {
 import createDebug from 'debug';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
+import type {
+  ConfigurationType,
+  FetchConfigurationType,
+  FinalResponseType,
+  IsResponseRedirectType,
+  IsResponseValidType,
+  ResponseType,
+  UserConfigurationType
+} from './types';
 import attemptRequest from './attemptRequest';
 import {
   UnexpectedResponseCodeError,

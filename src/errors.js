@@ -1,6 +1,9 @@
 // @flow
 
 import ExtendableError from 'es6-error';
+import type {
+  ResponseType
+} from './types';
 
 export class UnexpectedResponseError extends ExtendableError {
   response: ResponseType;

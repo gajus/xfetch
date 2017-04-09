@@ -6,12 +6,12 @@ import {
   CookieJar
 } from 'tough-cookie';
 
-type HttpMethodType = string;
+export type HttpMethodType = string;
 
 /**
  * @see https://github.com/tim-kos/node-retry#retrytimeoutsoptions
  */
-type RetryConfigurationType = {
+export type RetryConfigurationType = {
   factor?: number,
   maxTimeout?: number,
   minTimeout?: number,
@@ -22,14 +22,14 @@ type RetryConfigurationType = {
 /**
  * A callback that when called initiates a request.
  */
-type RequestHandlerType = (attemptNumber: number) => Promise<ResponseType>;
+export type RequestHandlerType = (attemptNumber: number) => Promise<ResponseType>;
 
 /**
  * A callback that handles HTTP response. It must return true to expected response or false to indicate unsuccessful response.
  */
-type IsResponseValidType = (response: ResponseType) => boolean | Promise<boolean>;
+export type IsResponseValidType = (response: ResponseType) => boolean | Promise<boolean>;
 
-type HeadersConfigurationType = {
+export type HeadersConfigurationType = {
   [key: string]: string | number
 };
 
@@ -40,11 +40,11 @@ type HeadersConfigurationType = {
  * Returning true will follow the redirect.
  * The default behaviour is to follow the redirect.
  */
-type HandleRedirectType = (response: ResponseType) => boolean | Promise<boolean>;
+export type HandleRedirectType = (response: ResponseType) => boolean | Promise<boolean>;
 
-type IsResponseRedirectType = (Response: ResponseType) => boolean;
+export type IsResponseRedirectType = (Response: ResponseType) => boolean;
 
-type UserConfigurationType = {
+export type UserConfigurationType = {
   +body?: string,
   +compress?: boolean,
   +headers?: HeadersConfigurationType,
@@ -57,7 +57,7 @@ type UserConfigurationType = {
   +responseType?: 'full' | 'text' | 'json'
 };
 
-type ConfigurationType = {
+export type ConfigurationType = {
   +agent?: HttpProxyAgent | HttpsProxyAgent,
   +body?: string,
   +compress?: boolean,
@@ -71,7 +71,7 @@ type ConfigurationType = {
   +responseType: 'full' | 'text' | 'json'
 };
 
-type FetchConfigurationType = {
+export type FetchConfigurationType = {
   +agent?: HttpProxyAgent | HttpsProxyAgent,
   +body?: string,
   +compress?: boolean,
@@ -80,16 +80,16 @@ type FetchConfigurationType = {
   +redirect: 'manual'
 };
 
-type RawHeadersType = {|
+export type RawHeadersType = {|
   [key: string]: Array<string>
 |};
 
-type HeadersType = {|
+export type HeadersType = {|
   +raw: () => RawHeadersType,
   +get: (name: string) => string
 |};
 
-type ResponseType = {|
+export type ResponseType = {|
   +headers: HeadersType,
   +json: () => Promise<Object>,
   +status: number,
@@ -97,4 +97,4 @@ type ResponseType = {|
   +url: string
 |};
 
-type FinalResponseType = ResponseType | string | Object;
+export type FinalResponseType = ResponseType | string | Object;

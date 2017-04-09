@@ -1,6 +1,12 @@
 // @flow
 
 import retry from 'retry';
+import type {
+  IsResponseValidType,
+  RequestHandlerType,
+  ResponseType,
+  RetryConfigurationType
+} from './types';
 import createDebug from './createDebug';
 import {
   UnexpectedResponseError
