@@ -19,6 +19,6 @@ export class UnexpectedResponseCodeError extends UnexpectedResponseError {
   constructor (response: ResponseType) {
     super(response);
 
-    this.message = 'Unespected response code.';
+    this.message = 'Unexpected response code.';
   }
 }
