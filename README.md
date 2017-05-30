@@ -73,10 +73,10 @@ type UserConfigurationType = {
   +method?: HttpMethodType,
   +query?: Object,
   +retry?: RetryConfigurationType,
-  +responseType?: 'full' | 'text'
+  +responseType?: 'full' | 'text' | 'json'
 };
 
-type fetch = (url: string, configuration?: ConfigurationType) => Promise<ResponseType>;
+type fetch = (url: string, configuration?: UserConfigurationType) => Promise<ResponseType>;
 
 ```
 
