@@ -16,7 +16,7 @@
     "es6-error": "^4.0.2",
     "http-proxy-agent": "^1.0.0",
     "https-proxy-agent": "^1.0.0",
-    "node-fetch": "^2.0.0-alpha.3",
+    "node-fetch": "^2.0.0-alpha.5",
     "retry": "^0.10.1",
     "tough-cookie": "^2.3.2"
   },
@@ -36,7 +36,7 @@
     "flow-copy-source": "^1.1.0",
     "husky": "^0.13.4",
     "nock": "^9.0.13",
-    "nyc": "^10.3.2",
+    "nyc": "^11.0.2",
     "semantic-release": "^6.3.6"
   },
   "engines": {
