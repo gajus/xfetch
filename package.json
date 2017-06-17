@@ -20,7 +20,7 @@
     "retry": "^0.10.1",
     "tough-cookie": "^2.3.2"
   },
-  "description": "A light-weight module that brings window.fetch to Node.js (with HTTP_PROXY support).",
+  "description": "A light-weight HTTP client for Node.js.",
   "devDependencies": {
     "ava": "^0.19.1",
     "babel-cli": "^6.24.1",
