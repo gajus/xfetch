@@ -50,7 +50,7 @@ const isResponseRedirect: IsResponseRedirectType = (response) => {
   return String(response.status).startsWith('3');
 };
 
-const handleRedirect = (response: Response, configuration: ConfigurationType) => {
+const handleRedirect = async (response: Response, configuration: ConfigurationType) => {
   const location = response.headers.get('location');
 
   if (!location) {

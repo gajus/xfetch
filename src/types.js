@@ -29,7 +29,7 @@ export type RequestHandlerType = (attemptNumber: number) => Promise<ResponseType
 /**
  * A callback that handles HTTP response. It must return true to expected response or false to indicate unsuccessful response.
  */
-export type IsResponseValidType = (response: ResponseType) => boolean | Promise<boolean>;
+export type IsResponseValidType = (response: ResponseType, currentAttempt: number) => boolean | Promise<boolean>;
 
 export type HeadersConfigurationType = {
   [key: string]: string | number

@@ -22,56 +22,53 @@ const defaultConfiguration = {
   retries: 0
 };
 
-export default (
+export default async (
   requestHandler: RequestHandlerType,
   isResponseValid: IsResponseValidType,
   userRetryConfiguration: RetryConfigurationType = {}
 ): Promise<ResponseType> => {
+  const retryConfiguration = {
+    ...defaultConfiguration,
+    ...userRetryConfiguration
+  };
+
+  const operation = retry.operation(retryConfiguration);
+
+  let currentAttempt = -1;
+
   return new Promise((resolve, reject) => {
-    let currentAttempt;
+    operation.attempt(async () => {
+      ++currentAttempt;
 
-    const retryConfiguration = Object.assign({}, defaultConfiguration, userRetryConfiguration);
+      debug('making %d request attempt (%d allowed retries)', currentAttempt + 1, retryConfiguration.retries);
 
-    const operation = retry.operation(retryConfiguration);
-
-    currentAttempt = -1;
-
-    operation
-      .attempt(async () => {
-        ++currentAttempt;
-
-        debug('making %d request attempt (%d allowed retries)', currentAttempt + 1, retryConfiguration.retries);
-
+      try {
         const response = await requestHandler(currentAttempt);
 
         debug('received response (status code) %d', response.status);
 
-        try {
-          const responseIsValid = await isResponseValid(response, currentAttempt);
+        const responseIsValid = await isResponseValid(response, currentAttempt);
 
-          if (responseIsValid === true) {
-            resolve(response);
-          } else {
-            throw new UnexpectedResponseError(response);
-          }
-        } catch (error) {
-          if (error instanceof UnexpectedResponseError) {
-            if (!operation.retry(error)) {
-              debug('maximum number of attempts has been exhausted');
-
-              reject(error);
-
-              return;
-            }
-
-            debug('response is invalid... going to make another attempt', {
-              headers: response.headers,
-              status: response.status
-            });
-          } else {
-            reject(error);
-          }
+        if (responseIsValid === true) {
+          resolve(response);
+        } else {
+          throw new UnexpectedResponseError(response);
         }
-      });
+      } catch (error) {
+        if (error instanceof UnexpectedResponseError) {
+          if (!operation.retry(error)) {
+            debug('maximum number of attempts has been exhausted');
+
+            reject(error);
+
+            return;
+          }
+
+          debug('response is invalid... going to make another attempt');
+        } else {
+          reject(error);
+        }
+      }
+    });
   });
 };
