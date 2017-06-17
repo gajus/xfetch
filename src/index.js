@@ -24,9 +24,9 @@ import HttpsProxyAgent from 'https-proxy-agent';
 import type {
   ConfigurationType,
   FetchConfigurationType,
-  FinalResponseType,
   IsResponseRedirectType,
   IsResponseValidType,
+  MakeRequestType,
   ResponseType,
   UserConfigurationType
 } from './types';
@@ -120,7 +120,7 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
 
   const responseType = userConfiguration.responseType || 'text';
 
-  const configuration: ConfigurationType = {
+  const configuration = {
     ...userConfiguration,
     agent,
     headers,
@@ -164,7 +164,7 @@ const createUrlWithQuery = (url: string, query: Object) => {
   return formatUrl(urlTokens);
 };
 
-const makeRequest = async (inputUrl: string, userConfiguration: UserConfigurationType = {}): Promise<FinalResponseType> => {
+const makeRequest: MakeRequestType = async (inputUrl, userConfiguration = {}) => {
   debug('requesting URL %s', inputUrl);
 
   const configuration = await createConfiguration(inputUrl, userConfiguration);

@@ -99,4 +99,4 @@ export type ResponseType = {|
   +url: string
 |};
 
-export type FinalResponseType = ResponseType | string | Object;
+export type MakeRequestType = (inputUrl: string, userConfiguration: UserConfigurationType) => Promise<*>;
