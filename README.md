@@ -5,7 +5,7 @@
 [![NPM version](http://img.shields.io/npm/v/xfetch.svg?style=flat-square)](https://www.npmjs.org/package/xfetch)
 [![Canonical Code Style](https://img.shields.io/badge/code%20style-canonical-blue.svg?style=flat-square)](https://github.com/gajus/canonical)
 
-A light-weight module that brings `window.fetch` to Node.js ([with `HTTP_PROXY` support](https://github.com/bitinn/node-fetch/issues/195)).
+A light-weight HTTP client for Node.js.
 
 * [API](#api)
 * [Configuration](#configuration)
@@ -17,6 +17,20 @@ A light-weight module that brings `window.fetch` to Node.js ([with `HTTP_PROXY` 
   * [Validate response](#validate-response)
   * [Make cookies persist between requests](#make-cookies-persist-between-requests)
 
+## Motivation
+
+It started as a light-wrapper of `node-fetch` due to the lack of [`HTTP_PROXY` support](https://github.com/bitinn/node-fetch/issues/195).
+
+The surface grew to incorporate new requirements. In comparison to the WHATWG [Fetch](https://fetch.spec.whatwg.org/), xfetch API is designed to keep the code minimal by providing short-cuts to common operations.
+
+On top of the `node-fetch`, xfetch implements:
+
+* [HTTP proxy](#http-proxy) support.
+* [Response validation](#validate-response).
+* [Retry request](#retry-request) strategy.
+* [In-built CookieJar](#make-cookies-persist-between-requests).
+* Strictly typed API.
+
 ## API
 
 ```js
@@ -25,7 +39,7 @@ type HeadersConfigurationType = {
 };
 
 type RawHeadersType = {|
-  [key: string]: Array<string>
+  [key: string]: $ReadOnlyArray<string>
 |};
 
 type HeadersType = {|
@@ -34,7 +48,6 @@ type HeadersType = {|
 |};
 
 type IsResponseRedirectType = (Response: ResponseType) => boolean;
-
 type IsResponseValidType = (response: ResponseType) => boolean | Promise<boolean>;
 
 type HttpMethodType = 'get' | 'post' | 'delete' | 'post' | 'trace';
@@ -93,7 +106,7 @@ Uses `HTTP_PROXY` (`http://host:port`) environment variable value to configure H
 
 Throws `UnexpectedResponseCodeError` error if response code is non-2xx or 3xx.
 
-This behaviour can be overrode using `isResponseValid` configuration.
+This behaviour can be overridden using `isResponseValid` configuration.
 
 ## Cookbook
 

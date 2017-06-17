@@ -1,3 +1,5 @@
+// @flow
+
 /* eslint-disable no-unused-vars, no-use-before-define */
 
 import HttpProxyAgent from 'http-proxy-agent';
@@ -81,7 +83,7 @@ export type FetchConfigurationType = {
 };
 
 export type RawHeadersType = {|
-  [key: string]: Array<string>
+  [key: string]: $ReadOnlyArray<string>
 |};
 
 export type HeadersType = {|
