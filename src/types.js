@@ -2,8 +2,12 @@
 
 /* eslint-disable no-unused-vars, no-use-before-define */
 
+import {
+  URLSearchParams
+} from 'url';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
+import FormData from 'form-data';
 import {
   CookieJar
 } from 'tough-cookie';
@@ -47,7 +51,7 @@ export type HandleRedirectType = (response: ResponseType) => boolean | Promise<b
 export type IsResponseRedirectType = (Response: ResponseType) => boolean;
 
 export type UserConfigurationType = {
-  +body?: string,
+  +body?: string | URLSearchParams | FormData,
   +compress?: boolean,
   +headers?: HeadersConfigurationType,
   +isResponseRedirect?: IsResponseRedirectType,
@@ -61,7 +65,7 @@ export type UserConfigurationType = {
 
 export type ConfigurationType = {
   +agent?: HttpProxyAgent | HttpsProxyAgent,
-  +body?: string,
+  +body?: string | URLSearchParams | FormData,
   +compress?: boolean,
   +headers: HeadersConfigurationType,
   +isResponseRedirect: IsResponseRedirectType,
@@ -75,7 +79,7 @@ export type ConfigurationType = {
 
 export type FetchConfigurationType = {
   +agent?: HttpProxyAgent | HttpsProxyAgent,
-  +body?: string,
+  +body?: string | URLSearchParams | FormData,
   +compress?: boolean,
   +headers: HeadersConfigurationType,
   +method: HttpMethodType,

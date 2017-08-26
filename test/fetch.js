@@ -7,7 +7,9 @@ import test, {
 import nock from 'nock';
 import fetch, {
   CookieJar,
-  UnexpectedResponseCodeError
+  FormData,
+  UnexpectedResponseCodeError,
+  URLSearchParams
 } from '../src';
 
 before(() => {
@@ -297,4 +299,42 @@ test('redirects persist cookies in a cookie jar', async (t) => {
   });
 
   t.true(response === 'bar');
+});
+
+test('FormData', async (t) => {
+  const formData = new FormData();
+
+  formData.append('foo', 'bar');
+
+  nock('http://gajus.com')
+    .post('/', (body) => {
+      return body.replace(/[0-9]+/g, 'X') === '----------------------------X\r\nContent-Disposition: form-data; name="foo"\r\n\r\nbar\r\n----------------------------X--\r\n';
+    })
+    .reply(200, 'foo');
+
+  const response = await fetch('http://gajus.com/', {
+    body: formData,
+    method: 'post'
+  });
+
+  t.true(response === 'foo');
+});
+
+test('URLSearchParams', async (t) => {
+  const formData = new URLSearchParams();
+
+  formData.append('foo', 'bar');
+
+  nock('http://gajus.com')
+    .post('/', {
+      foo: 'bar'
+    })
+    .reply(200, 'foo');
+
+  const response = await fetch('http://gajus.com/', {
+    body: formData,
+    method: 'post'
+  });
+
+  t.true(response === 'foo');
 });

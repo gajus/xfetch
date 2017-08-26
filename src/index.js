@@ -5,7 +5,8 @@
 // eslint-disable-next-line filenames/match-exported
 import {
   format as formatUrl,
-  parse as parseUrl
+  parse as parseUrl,
+  URLSearchParams
 } from 'url';
 import {
   promisify
@@ -18,6 +19,7 @@ import fetch, {
 import {
   CookieJar
 } from 'tough-cookie';
+import FormData from 'form-data';
 import createDebug from 'debug';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
@@ -220,11 +222,13 @@ export default makeRequest;
 
 export {
   CookieJar,
+  FormData,
   Headers,
   isResponseRedirect,
   isResponseValid,
   Request,
   Response,
   UnexpectedResponseCodeError,
-  UnexpectedResponseError
+  UnexpectedResponseError,
+  URLSearchParams
 };

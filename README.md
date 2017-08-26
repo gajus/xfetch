@@ -77,7 +77,7 @@ type ResponseType = {|
  * @property jar An instance of `tough-cookie` [`CookieJar`](https://github.com/salesforce/tough-cookie#cookiejar). Used to collect & set cookies.
  */
 type UserConfigurationType = {
-  +body?: string,
+  +body?: string | URLSearchParams | FormData,
   +compress?: boolean,
   +headers?: HeadersConfigurationType,
   +isResponseRedirect?: IsResponseRedirectType,
