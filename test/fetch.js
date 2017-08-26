@@ -149,7 +149,7 @@ test('headers.get() resolves response header', async (t) => {
 test('follows 3xx redirects', async (t) => {
   nock('http://gajus.com')
     .get('/')
-    .reply(301, 'foo', {
+    .reply(301, undefined, {
       Location: 'http://gajus.com/foo'
     });
 
@@ -163,6 +163,42 @@ test('follows 3xx redirects', async (t) => {
 
   t.true(await response.text() === 'bar');
   t.true(response.url === 'http://gajus.com/foo');
+});
+
+test('follows 3xx redirects (responseType text)', async (t) => {
+  nock('http://gajus.com')
+    .get('/')
+    .reply(301, undefined, {
+      Location: 'http://gajus.com/foo'
+    });
+
+  nock('http://gajus.com')
+    .get('/foo')
+    .reply(200, 'foo');
+
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'text'
+  });
+
+  t.true(await response === 'foo');
+});
+
+test('follows 3xx redirects (responseType JSON)', async (t) => {
+  nock('http://gajus.com')
+    .get('/')
+    .reply(301, undefined, {
+      Location: 'http://gajus.com/foo'
+    });
+
+  nock('http://gajus.com')
+    .get('/foo')
+    .reply(200, '"foo"');
+
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'json'
+  });
+
+  t.true(await response === 'foo');
 });
 
 test('follows 3xx redirect preserves the original headers', async (t) => {
