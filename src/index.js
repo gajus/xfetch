@@ -139,7 +139,7 @@ const createFetchConfiguration = (configuration: ConfigurationType): FetchConfig
   const fetchConfiguration: Object = {
     method: configuration.method || 'get',
     redirect: 'manual',
-    timeout: 30 * 1000
+    timeout: 60 * 1000
   };
 
   const fetchConfigurationOptionalProperties = [

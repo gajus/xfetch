@@ -113,7 +113,7 @@ This behaviour can be overridden using `isResponseValid` configuration.
 
 ### Timeout
 
-`xfetch` defaults to a 30 seconds timeout after which `ResponseTimeoutError` error is thrown.
+`xfetch` defaults to a 60 seconds timeout after which `ResponseTimeoutError` error is thrown.
 
 A timeout error does not trigger the request retry strategy.
 
