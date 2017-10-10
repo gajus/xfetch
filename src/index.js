@@ -34,6 +34,7 @@ import type {
 } from './types';
 import attemptRequest from './attemptRequest';
 import {
+  ResponseTimeoutError,
   UnexpectedResponseCodeError,
   UnexpectedResponseError
 } from './errors';
@@ -142,7 +143,8 @@ const createFetchConfiguration = (configuration: ConfigurationType): FetchConfig
     'agent',
     'body',
     'compress',
-    'headers'
+    'headers',
+    'timeout'
   ];
 
   for (const fetchConfigurationOptionalProperty of fetchConfigurationOptionalProperties) {
@@ -176,7 +178,17 @@ const makeRequest: MakeRequestType = async (inputUrl, userConfiguration = {}) =>
   const createRequestAttempt = async (): Promise<ResponseType> => {
     const fetchConfiguration = createFetchConfiguration(configuration);
 
-    const response = await fetch(url, fetchConfiguration);
+    let response;
+
+    try {
+      response = await fetch(url, fetchConfiguration);
+    } catch (error) {
+      if (typeof error.type === 'string' && error.type === 'request-timeout') {
+        throw new ResponseTimeoutError();
+      } else {
+        throw error;
+      }
+    }
 
     if (userConfiguration.jar) {
       const setCookie = promisify(userConfiguration.jar.setCookie.bind(userConfiguration.jar));
@@ -228,6 +240,7 @@ export {
   isResponseValid,
   Request,
   Response,
+  ResponseTimeoutError,
   UnexpectedResponseCodeError,
   UnexpectedResponseError,
   URLSearchParams

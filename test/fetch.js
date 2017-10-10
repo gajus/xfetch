@@ -8,6 +8,7 @@ import nock from 'nock';
 import fetch, {
   CookieJar,
   FormData,
+  ResponseTimeoutError,
   UnexpectedResponseCodeError,
   URLSearchParams
 } from '../src';
@@ -35,6 +36,17 @@ test('throws UnexpectedResponseCode if response code is not 2xx', async (t) => {
     .reply(500);
 
   await t.throws(fetch('http://gajus.com/'), UnexpectedResponseCodeError);
+});
+
+test(async (t) => {
+  nock('http://gajus.com')
+    .get('/')
+    .delay(2000)
+    .reply(200, 'Hello, World!');
+
+  await t.throws(fetch('http://gajus.com/', {
+    timeout: 1
+  }), ResponseTimeoutError);
 });
 
 test('{responseType: text} resolves the response body ', async (t) => {

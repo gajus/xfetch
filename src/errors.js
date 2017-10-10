@@ -22,3 +22,9 @@ export class UnexpectedResponseCodeError extends UnexpectedResponseError {
     this.message = 'Unexpected response code.';
   }
 }
+
+export class ResponseTimeoutError extends ExtendableError {
+  constructor () {
+    super('Response not received with the configured timeout.');
+  }
+}

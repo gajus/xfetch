@@ -12,6 +12,7 @@ A light-weight HTTP client for Node.js.
 * [Behaviour](#behaviour)
   * [HTTP proxy](#http-proxy)
   * [Throws an error if response code is non-2xx](#throws-an-error-if-response-code-is-non-2xx)
+  * [Timeout](#timeout)
 * [Cookbook](#cookbook)
   * [Retry request](#retry-request)
   * [Validate response](#validate-response)
@@ -75,6 +76,7 @@ type ResponseType = {|
  * @property isResponseValid Used to validate response. Refer to [Validate response](#validate-response).
  * @property retry Used to retry requests that produce response that does not pass validation. Refer to [Retry request](#retry-request) and [Validating response](#validating-response).
  * @property jar An instance of `tough-cookie` [`CookieJar`](https://github.com/salesforce/tough-cookie#cookiejar). Used to collect & set cookies.
+ * @property timeout Timeout in milliseconds.
  */
 type UserConfigurationType = {
   +body?: string | URLSearchParams | FormData,
@@ -85,8 +87,9 @@ type UserConfigurationType = {
   +jar?: CookieJar,
   +method?: HttpMethodType,
   +query?: Object,
+  +responseType?: 'full' | 'text' | 'json',
   +retry?: RetryConfigurationType,
-  +responseType?: 'full' | 'text' | 'json'
+  +timeout?: number
 };
 
 type fetch = (url: string, configuration?: UserConfigurationType) => Promise<ResponseType>;
@@ -107,6 +110,31 @@ Uses `HTTP_PROXY` (`http://host:port`) environment variable value to configure H
 Throws `UnexpectedResponseCodeError` error if response code is non-2xx or 3xx.
 
 This behaviour can be overridden using `isResponseValid` configuration.
+
+### Timeout
+
+`xfetch` defaults to a 30 seconds timeout after which `ResponseTimeoutError` error is thrown.
+
+A timeout error does not trigger the request retry strategy.
+
+```js
+import xfetch, {
+  ResponseTimeoutError
+} from 'xfetch';
+
+try {
+  await fetch('http://gajus.com/', {
+    timeout: 30 * 1000
+  });
+} catch (error) {
+  if (error instanceof ResponseTimeoutError) {
+    // Request has not received a response within 30 seconds.
+  }
+
+  throw error;
+}
+
+```
 
 ## Cookbook
 

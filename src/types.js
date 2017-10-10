@@ -59,8 +59,9 @@ export type UserConfigurationType = {
   +jar?: CookieJar,
   +method?: HttpMethodType,
   +query?: Object,
+  +responseType?: 'full' | 'text' | 'json',
   +retry?: RetryConfigurationType,
-  +responseType?: 'full' | 'text' | 'json'
+  +timeout?: number
 };
 
 export type ConfigurationType = {
@@ -74,7 +75,8 @@ export type ConfigurationType = {
   +method?: HttpMethodType,
   +query?: Object,
   +retry?: RetryConfigurationType,
-  +responseType: 'full' | 'text' | 'json'
+  +responseType: 'full' | 'text' | 'json',
+  +timeout: number
 };
 
 export type FetchConfigurationType = {
