@@ -138,7 +138,8 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
 const createFetchConfiguration = (configuration: ConfigurationType): FetchConfigurationType => {
   const fetchConfiguration: Object = {
     method: configuration.method || 'get',
-    redirect: 'manual'
+    redirect: 'manual',
+    timeout: 30 * 1000
   };
 
   const fetchConfigurationOptionalProperties = [
