@@ -1,18 +1,20 @@
 // @flow
 
 import retry from 'retry';
+import Logger from './Logger';
 import type {
   IsResponseValidType,
   RequestHandlerType,
   ResponseType,
   RetryConfigurationType
 } from './types';
-import createDebug from './createDebug';
 import {
   UnexpectedResponseError
 } from './errors';
 
-const debug = createDebug('attemptRequest');
+const log = Logger.child({
+  namespace: 'attemptRequest'
+});
 
 const defaultConfiguration = {
   factor: 2,
@@ -40,12 +42,12 @@ export default async (
     operation.attempt(async () => {
       ++currentAttempt;
 
-      debug('making %d request attempt (%d allowed retries)', currentAttempt + 1, retryConfiguration.retries);
+      log.debug('making %d request attempt (%d allowed retries)', currentAttempt + 1, retryConfiguration.retries);
 
       try {
         const response = await requestHandler(currentAttempt);
 
-        debug('received response (status code) %d', response.status);
+        log.debug('received response (status code) %d', response.status);
 
         const responseIsValid = await isResponseValid(response, currentAttempt);
 
@@ -57,14 +59,14 @@ export default async (
       } catch (error) {
         if (error instanceof UnexpectedResponseError) {
           if (!operation.retry(error)) {
-            debug('maximum number of attempts has been exhausted');
+            log.debug('maximum number of attempts has been exhausted');
 
             reject(error);
 
             return;
           }
 
-          debug('response is invalid... going to make another attempt');
+          log.debug('response is invalid... going to make another attempt');
         } else {
           reject(error);
         }

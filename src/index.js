@@ -20,9 +20,9 @@ import {
   CookieJar
 } from 'tough-cookie';
 import FormData from 'form-data';
-import createDebug from 'debug';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
+import Logger from './Logger';
 import type {
   ConfigurationType,
   FetchConfigurationType,
@@ -39,7 +39,9 @@ import {
   UnexpectedResponseError
 } from './errors';
 
-const debug = createDebug('xfetch');
+const log = Logger.child({
+  namespace: 'client'
+});
 
 const isResponseValid: IsResponseValidType = async (response) => {
   if (!String(response.status).startsWith('2') && !String(response.status).startsWith('3')) {
@@ -100,7 +102,7 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
   let agent;
 
   if (process.env.HTTP_PROXY) {
-    debug('using proxy %s', process.env.HTTP_PROXY);
+    log.debug('using proxy %s', process.env.HTTP_PROXY);
 
     if (process.env.NODE_TLS_REJECT_UNAUTHORIZED !== '0') {
       throw new Error('Must configure NODE_TLS_REJECT_UNAUTHORIZED.');
@@ -169,7 +171,7 @@ const createUrlWithQuery = (url: string, query: Object) => {
 };
 
 const makeRequest: MakeRequestType = async (inputUrl, userConfiguration = {}) => {
-  debug('requesting URL %s', inputUrl);
+  log.debug('requesting URL %s', inputUrl);
 
   const configuration = await createConfiguration(inputUrl, userConfiguration);
 
@@ -214,7 +216,7 @@ const makeRequest: MakeRequestType = async (inputUrl, userConfiguration = {}) =>
   const finalResponse = await attemptRequest(createRequestAttempt, configuration.isResponseValid || isResponseValid, configuration.retry);
 
   if (isResponseRedirect(finalResponse)) {
-    debug('response identified as a redirect');
+    log.debug('response identified as a redirect');
 
     return handleRedirect(finalResponse, configuration);
   }
