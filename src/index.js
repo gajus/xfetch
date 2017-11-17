@@ -22,6 +22,7 @@ import {
 import FormData from 'form-data';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
+import getProxy from 'get-url-proxy/cached';
 import Logger from './Logger';
 import type {
   ConfigurationType,
@@ -100,9 +101,10 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
   }
 
   let agent;
+  const proxy = getProxy(url);
 
-  if (process.env.HTTP_PROXY) {
-    log.debug('using proxy %s', process.env.HTTP_PROXY);
+  if (proxy) {
+    log.debug('using proxy %s', proxy);
 
     if (process.env.NODE_TLS_REJECT_UNAUTHORIZED !== '0') {
       throw new Error('Must configure NODE_TLS_REJECT_UNAUTHORIZED.');
@@ -110,7 +112,7 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
 
     const AgentConstructor = url.toLowerCase().startsWith('https://') ? HttpsProxyAgent : HttpProxyAgent;
 
-    agent = new AgentConstructor(process.env.HTTP_PROXY);
+    agent = new AgentConstructor(proxy);
   }
 
   const host = getHost(url);
