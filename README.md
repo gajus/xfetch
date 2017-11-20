@@ -100,7 +100,12 @@ type fetch = (url: string, configuration?: UserConfigurationType) => Promise<Res
 
 ### HTTP proxy
 
-Uses `HTTP_PROXY` (`http://host:port`) environment variable value to configure HTTP proxy.
+Uses `PROTOCOL_PROXY` environment variable value to configure HTTP(S) proxy and supports `NO_PROXY` exclusions.
+
+```
+export NO_PROXY=".localdomain,192.168.1."
+export HTTP_PROXY="http://host:port"
+```
 
 > Note: You must also configure `NODE_TLS_REJECT_UNAUTHORIZED=0`.
 > This is a lazy workaround to enable the proxy to work with TLS.
