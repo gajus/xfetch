@@ -14,6 +14,7 @@
     "bluefeather": "^2.7.0",
     "es6-error": "^4.0.2",
     "form-data": "^2.3.1",
+    "get-url-proxy": "^1.1.2",
     "http-proxy-agent": "^2.0.0",
     "https-proxy-agent": "^2.1.0",
     "node-fetch": "^2.0.0-alpha.5",
@@ -72,5 +73,5 @@
     "precommit": "npm run lint && npm run test && npm run build",
     "test": "NODE_ENV=development nyc --reporter=text ava --verbose --serial"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

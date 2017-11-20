@@ -9,3 +9,4 @@ node_modules
 !.gitignore
 !.npmignore
 !.travis.yml
+package-lock.json
