@@ -218,7 +218,9 @@ const makeRequest: MakeRequestType = async (inputUrl, userConfiguration = {}) =>
 
   const finalResponse = await attemptRequest(createRequestAttempt, configuration.isResponseValid || isResponseValid, configuration.retry);
 
-  if (isResponseRedirect(finalResponse)) {
+  const finalIsResponseRedirect = configuration.isResponseRedirect || isResponseRedirect;
+
+  if (finalIsResponseRedirect(finalResponse)) {
     log.debug('response identified as a redirect');
 
     return handleRedirect(finalResponse, configuration);
