@@ -288,6 +288,25 @@ test('3xx redirect changes the request method to GET if the original request met
   t.true(response === 'bar');
 });
 
+test('3xx redirect changes the request method to GET if the original request method is not safe to repeat (e.g. POST) (with body)', async (t) => {
+  nock('http://gajus.com')
+    .post('/', 'foo')
+    .reply(301, 'foo', {
+      location: 'http://gajus.com/foo'
+    });
+
+  nock('http://gajus.com')
+    .get('/foo')
+    .reply(200, 'bar');
+
+  const response = await fetch('http://gajus.com/', {
+    body: 'foo',
+    method: 'post'
+  });
+
+  t.true(response === 'bar');
+});
+
 test('redirects persist cookies in a cookie jar', async (t) => {
   const jar = new CookieJar();
 

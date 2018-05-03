@@ -39,6 +39,9 @@ import {
   UnexpectedResponseCodeError,
   UnexpectedResponseError
 } from './errors';
+import {
+  omit
+} from './utilities';
 
 const log = Logger.child({
   namespace: 'client'
@@ -76,7 +79,7 @@ const handleRedirect = async (response: Response, configuration: ConfigurationTy
 
   // eslint-disable-next-line no-use-before-define
   return makeRequest(location, {
-    ...configuration,
+    ...omit(configuration, 'body'),
     method: nextMethod
   });
 };
