@@ -1,29 +1,21 @@
 {
   "env": {
-    "development": {
+    "test": {
       "plugins": [
         "istanbul"
-      ],
-      "sourceMaps": "inline"
+      ]
     }
   },
   "plugins": [
-    [
-      "transform-object-rest-spread",
-      {
-        "useBuiltIns": true
-      }
-    ],
-    "transform-flow-strip-types"
+    "@babel/transform-flow-strip-types"
   ],
   "presets": [
     [
-      "env",
+      "@babel/env",
       {
         "targets": {
           "node": 8
-        },
-        "useBuiltIns": true
+        }
       }
     ]
   ]

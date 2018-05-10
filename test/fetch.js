@@ -38,7 +38,7 @@ test('throws UnexpectedResponseCode if response code is not 2xx', async (t) => {
   await t.throws(fetch('http://gajus.com/'), UnexpectedResponseCodeError);
 });
 
-test(async (t) => {
+test('throws ResponseTimeoutError if response is not received in `timeout` time', async (t) => {
   nock('http://gajus.com')
     .get('/')
     .delay(2000)
