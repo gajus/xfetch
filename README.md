@@ -123,7 +123,7 @@ This behaviour can be overridden using `isResponseValid` configuration.
 A timeout error does not trigger the request retry strategy.
 
 ```js
-import xfetch, {
+import fetch, {
   ResponseTimeoutError
 } from 'xfetch';
 
@@ -140,6 +140,8 @@ try {
 }
 
 ```
+
+The default timeout can be configured using `XFETCH_REQUEST_TIMEOUT` (milliseconds) environment variable.
 
 ## Cookbook
 

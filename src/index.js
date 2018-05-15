@@ -42,6 +42,10 @@ import {
 import {
   omit
 } from './utilities';
+import {
+  DEFAULT_REQUEST_TIMEOUT,
+  REQUEST_TIMEOUT
+} from './config';
 
 const log = Logger.child({
   namespace: 'client'
@@ -144,7 +148,7 @@ const createFetchConfiguration = (configuration: ConfigurationType): FetchConfig
   const fetchConfiguration: Object = {
     method: configuration.method || 'get',
     redirect: 'manual',
-    timeout: 60 * 60 * 1000
+    timeout: REQUEST_TIMEOUT || DEFAULT_REQUEST_TIMEOUT
   };
 
   const fetchConfigurationOptionalProperties = [
