@@ -1,21 +1,17 @@
 // @flow
 
-/* eslint-disable no-process-env */
-
 // eslint-disable-next-line filenames/match-exported
 import {
-  format as formatUrl,
   parse as parseUrl,
   URLSearchParams
 } from 'url';
+import got, {
+  HTTPError,
+  RequestError
+} from 'got';
 import {
   promisify
 } from 'bluefeather';
-import fetch, {
-  Headers,
-  Request,
-  Response
-} from 'node-fetch';
 import {
   CookieJar
 } from 'tough-cookie';
@@ -26,10 +22,10 @@ import getProxy from 'get-url-proxy/cached';
 import Logger from './Logger';
 import type {
   ConfigurationType,
-  FetchConfigurationType,
+  CreateRequestType,
+  HttpClientConfigurationType,
   IsResponseRedirectType,
   IsResponseValidType,
-  MakeRequestType,
   ResponseType,
   UserConfigurationType
 } from './types';
@@ -42,6 +38,9 @@ import {
 import {
   omit
 } from './utilities';
+import {
+  createHeadersLenient
+} from './Headers';
 import {
   DEFAULT_REQUEST_TIMEOUT,
   REQUEST_TIMEOUT
@@ -82,7 +81,7 @@ const handleRedirect = async (response: Response, configuration: ConfigurationTy
   const nextMethod = safeMethods.includes(originalMethod) ? originalMethod : 'get';
 
   // eslint-disable-next-line no-use-before-define
-  return makeRequest(location, {
+  return createRequest(location, {
     ...omit(configuration, 'body'),
     method: nextMethod
   });
@@ -108,11 +107,13 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
   }
 
   let agent;
+
   const proxy = getProxy(url);
 
   if (proxy) {
     log.debug('using proxy %s', proxy);
 
+    // eslint-disable-next-line no-process-env
     if (process.env.NODE_TLS_REJECT_UNAUTHORIZED !== '0') {
       throw new Error('Must configure NODE_TLS_REJECT_UNAUTHORIZED.');
     }
@@ -144,17 +145,21 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
   return configuration;
 };
 
-const createFetchConfiguration = (configuration: ConfigurationType): FetchConfigurationType => {
+const createHttpClientConfiguration = (configuration: ConfigurationType): HttpClientConfigurationType => {
   const fetchConfiguration: Object = {
-    method: configuration.method || 'get',
-    redirect: 'manual',
-    timeout: REQUEST_TIMEOUT || DEFAULT_REQUEST_TIMEOUT
+    decompress: true,
+    followRedirect: false,
+    method: configuration.method ? configuration.method.toUpperCase() : 'GET',
+    throwHttpErrors: false,
+    timeout: configuration.timeout || REQUEST_TIMEOUT || DEFAULT_REQUEST_TIMEOUT
   };
 
+  // @todo Test unexpected options.
+
   const fetchConfigurationOptionalProperties = [
+    'query',
     'agent',
     'body',
-    'compress',
     'headers',
     'timeout'
   ];
@@ -165,47 +170,48 @@ const createFetchConfiguration = (configuration: ConfigurationType): FetchConfig
     }
   }
 
+  if (fetchConfiguration.body && fetchConfiguration.body instanceof URLSearchParams) {
+    fetchConfiguration.body = fetchConfiguration.body.toString();
+
+    // @todo Use Headers.
+    // @todo Ensure that content-type is not already set.
+    fetchConfiguration.headers = fetchConfiguration.headers || {};
+    fetchConfiguration.headers['content-type'] = 'application/x-www-form-urlencoded';
+  }
+
   return fetchConfiguration;
 };
 
-const createUrlWithQuery = (url: string, query: Object) => {
-  const urlTokens = parseUrl(url);
+const createRequest: CreateRequestType = async (url, userConfiguration = {}) => {
+  log.debug('requesting URL %s', url);
 
-  if (urlTokens.query) {
-    throw new Error('Cannot append query parameters to URL with existing query parameters.');
-  }
-
-  urlTokens.query = query;
-
-  return formatUrl(urlTokens);
-};
-
-const makeRequest: MakeRequestType = async (inputUrl, userConfiguration = {}) => {
-  log.debug('requesting URL %s', inputUrl);
-
-  const configuration = await createConfiguration(inputUrl, userConfiguration);
-
-  const url = configuration.query ? createUrlWithQuery(inputUrl, configuration.query) : inputUrl;
+  const configuration = await createConfiguration(url, userConfiguration);
 
   const createRequestAttempt = async (): Promise<ResponseType> => {
-    const fetchConfiguration = createFetchConfiguration(configuration);
+    const httpClientConfiguration = createHttpClientConfiguration(configuration);
 
     let response;
 
     try {
-      response = await fetch(url, fetchConfiguration);
+      response = await got(url, httpClientConfiguration);
     } catch (error) {
-      if (typeof error.type === 'string' && error.type === 'request-timeout') {
+      if (error instanceof RequestError && error.code === 'ETIMEDOUT') {
         throw new ResponseTimeoutError();
-      } else {
+      }
+
+      if (error instanceof HTTPError) {
         throw error;
       }
+
+      throw error;
     }
+
+    const headers = createHeadersLenient(response.headers);
 
     if (userConfiguration.jar) {
       const setCookie = promisify(userConfiguration.jar.setCookie.bind(userConfiguration.jar));
 
-      const cookies = response.headers.raw()['set-cookie'];
+      const cookies = headers.raw()['set-cookie'];
 
       if (cookies) {
         for (const cookie of cookies) {
@@ -215,10 +221,14 @@ const makeRequest: MakeRequestType = async (inputUrl, userConfiguration = {}) =>
     }
 
     return {
-      headers: response.headers,
-      json: response.json.bind(response),
-      status: response.status,
-      text: response.text.bind(response),
+      headers,
+      json: () => {
+        return JSON.parse(response.body);
+      },
+      status: response.statusCode,
+      text: () => {
+        return response.body;
+      },
       url
     };
   };
@@ -244,16 +254,13 @@ const makeRequest: MakeRequestType = async (inputUrl, userConfiguration = {}) =>
   return finalResponse;
 };
 
-export default makeRequest;
+export default createRequest;
 
 export {
   CookieJar,
   FormData,
-  Headers,
   isResponseRedirect,
   isResponseValid,
-  Request,
-  Response,
   ResponseTimeoutError,
   UnexpectedResponseCodeError,
   UnexpectedResponseError,

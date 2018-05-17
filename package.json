@@ -14,9 +14,9 @@
     "es6-error": "^4.1.1",
     "form-data": "^2.3.2",
     "get-url-proxy": "^1.1.2",
+    "got": "^8.3.1",
     "http-proxy-agent": "^2.1.0",
     "https-proxy-agent": "^2.2.1",
-    "node-fetch": "^2.1.2",
     "retry": "^0.12.0",
     "roarr": "^2.2.0",
     "tough-cookie": "^2.3.4"

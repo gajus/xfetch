@@ -79,7 +79,7 @@ export type ConfigurationType = {
   +timeout: number
 };
 
-export type FetchConfigurationType = {
+export type HttpClientConfigurationType = {
   +agent?: HttpProxyAgent | HttpsProxyAgent,
   +body?: string | URLSearchParams | FormData,
   +compress?: boolean,
@@ -105,4 +105,4 @@ export type ResponseType = {|
   +url: string
 |};
 
-export type MakeRequestType = (inputUrl: string, userConfiguration?: UserConfigurationType) => Promise<*>;
+export type CreateRequestType = (inputUrl: string, userConfiguration?: UserConfigurationType) => Promise<*>;
