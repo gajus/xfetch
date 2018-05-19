@@ -63,10 +63,16 @@ const isResponseRedirect: IsResponseRedirectType = (response) => {
 };
 
 const handleRedirect = async (response: Response, configuration: ConfigurationType) => {
-  const location = response.headers.get('location');
+  let location = response.headers.get('location');
 
   if (!location) {
     throw new Error('Missing the location header.');
+  }
+
+  if (location.startsWith('/')) {
+    const urlTokens = parseUrl(response.url);
+
+    location = urlTokens.protocol + '//' + urlTokens.host + location;
   }
 
   const originalMethod = configuration.method && configuration.method.toLowerCase();
@@ -145,6 +151,7 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
   return configuration;
 };
 
+// eslint-disable-next-line complexity
 const createHttpClientConfiguration = (configuration: ConfigurationType): HttpClientConfigurationType => {
   const fetchConfiguration: Object = {
     cache: false,

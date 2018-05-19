@@ -179,6 +179,25 @@ test('follows 3xx redirects', async (t) => {
   t.true(response.url === 'http://gajus.com/foo');
 });
 
+test('follows 3xx redirects (absolute path)', async (t) => {
+  nock('http://gajus.com')
+    .get('/')
+    .reply(301, undefined, {
+      Location: '/foo'
+    });
+
+  nock('http://gajus.com')
+    .get('/foo')
+    .reply(200, 'bar');
+
+  const response = await fetch('http://gajus.com/', {
+    responseType: 'full'
+  });
+
+  t.true(await response.text() === 'bar');
+  t.true(response.url === 'http://gajus.com/foo');
+});
+
 test('follows 3xx redirects (responseType text)', async (t) => {
   nock('http://gajus.com')
     .get('/')
