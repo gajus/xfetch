@@ -147,9 +147,11 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
 
 const createHttpClientConfiguration = (configuration: ConfigurationType): HttpClientConfigurationType => {
   const fetchConfiguration: Object = {
+    cache: false,
     decompress: true,
     followRedirect: false,
     method: configuration.method ? configuration.method.toUpperCase() : 'GET',
+    retries: 0,
     throwHttpErrors: false,
     timeout: configuration.timeout || REQUEST_TIMEOUT || DEFAULT_REQUEST_TIMEOUT
   };
