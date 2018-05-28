@@ -27,9 +27,9 @@ const defaultConfiguration = {
 export default async (
   requestHandler: RequestHandlerType,
   isResponseValid: IsResponseValidType,
-  userRetryConfiguration: RetryConfigurationType = {}
+  userRetryConfiguration: RetryConfigurationType
 ): Promise<ResponseType> => {
-  const retryConfiguration = {
+  const retryConfiguration: RetryConfigurationType = {
     ...defaultConfiguration,
     ...userRetryConfiguration
   };

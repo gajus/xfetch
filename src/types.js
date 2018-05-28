@@ -39,15 +39,6 @@ export type HeadersConfigurationType = {
   [key: string]: string | number
 };
 
-/**
- * A callback used to validate HTTP redirect attempt.
- *
- * Returning false will return the current response.
- * Returning true will follow the redirect.
- * The default behaviour is to follow the redirect.
- */
-export type HandleRedirectType = (response: ResponseType) => boolean | Promise<boolean>;
-
 export type IsResponseRedirectType = (Response: ResponseType) => boolean;
 
 export type UserConfigurationType = {

@@ -62,7 +62,7 @@ const isResponseRedirect: IsResponseRedirectType = (response) => {
   return String(response.status).startsWith('3');
 };
 
-const handleRedirect = async (response: Response, configuration: ConfigurationType) => {
+const handleRedirect = async (response, configuration) => {
   let location = response.headers.get('location');
 
   if (!location) {
@@ -71,6 +71,14 @@ const handleRedirect = async (response: Response, configuration: ConfigurationTy
 
   if (location.startsWith('/')) {
     const urlTokens = parseUrl(response.url);
+
+    if (!urlTokens.protocol) {
+      throw new Error('Unexpected state.');
+    }
+
+    if (!urlTokens.host) {
+      throw new Error('Unexpected state.');
+    }
 
     location = urlTokens.protocol + '//' + urlTokens.host + location;
   }
@@ -141,14 +149,12 @@ const createConfiguration = async (url: string, userConfiguration: UserConfigura
 
   const responseType = userConfiguration.responseType || 'text';
 
-  const configuration = {
+  return {
     ...userConfiguration,
     agent,
     headers,
     responseType
   };
-
-  return configuration;
 };
 
 // eslint-disable-next-line complexity
@@ -242,7 +248,7 @@ const createRequest: CreateRequestType = async (url, userConfiguration = {}) => 
     };
   };
 
-  const finalResponse = await attemptRequest(createRequestAttempt, configuration.isResponseValid || isResponseValid, configuration.retry);
+  const finalResponse = await attemptRequest(createRequestAttempt, configuration.isResponseValid || isResponseValid, configuration.retry || {});
 
   const finalIsResponseRedirect = configuration.isResponseRedirect || isResponseRedirect;
 
